@@ -1,0 +1,11 @@
+@import url("purecss/build/base.css");
+
+main {
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+.container {
+  margin: 1rem auto;
+  max-width: 64rem;
+}
