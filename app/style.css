@@ -1,4 +1,8 @@
 @import url("purecss/build/base.css");
+@import url("purecss/build/forms.css");
+@import url("purecss/build/buttons.css");
+@import url("purecss/build/grids.css");
+@import url("purecss/build/grids-responsive.css");
 
 main {
   padding-left: 2rem;
@@ -8,4 +12,27 @@ main {
 .container {
   margin: 1rem auto;
   max-width: 64rem;
+}
+
+.scroll-list {
+  max-height: 32rem;
+  overflow-y: auto;
+}
+
+.border {
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 0 1rem;
+}
+
+.success {
+  border-color: limegreen;
+}
+
+.warning {
+  border-color: orange;
+}
+
+.error {
+  border-color: coral;
 }
