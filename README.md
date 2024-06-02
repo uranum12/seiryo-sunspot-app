@@ -41,5 +41,6 @@ python api/main.py
 ```sh
 poetry run inv fmt
 poetry run inv lint
+poetry run inv test --cov
 ```
 
