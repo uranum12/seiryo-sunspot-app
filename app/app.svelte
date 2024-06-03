@@ -1,15 +1,15 @@
 <script lang="ts">
-import { onMount } from "svelte"
+  import { onMount } from "svelte"
 
-import Agg from "./pages/agg.svelte"
+  import Agg from "./pages/agg.svelte"
 
-let page: string
+  let page: string
 
-const getPageName = () => {
-  page = location.hash.replace("#", "")
-}
+  const getPageName = () => {
+    page = location.hash.replace("#", "")
+  }
 
-onMount(getPageName)
+  onMount(getPageName)
 </script>
 
 <svelte:window on:hashchange={getPageName} />

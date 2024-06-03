@@ -1,75 +1,75 @@
 <script lang="ts">
-import axios, { type AxiosError } from "axios"
-import { onMount } from "svelte"
+  import axios, { type AxiosError } from "axios"
+  import { onMount } from "svelte"
 
-type File = {
-  name: string
-  path: string
-  select: boolean
-}
+  type File = {
+    name: string
+    path: string
+    select: boolean
+  }
 
-let files: File[] = []
-let filename = ""
-let loading = false
-let submitDisabled: boolean
-let output = ""
-let error = ""
+  let files: File[] = []
+  let filename = ""
+  let loading = false
+  let submitDisabled: boolean
+  let output = ""
+  let error = ""
 
-$: submitDisabled =
-  files.filter((file) => file.select).length === 0 || filename === ""
+  $: submitDisabled =
+    files.filter((file) => file.select).length === 0 || filename === ""
 
-const getFiles = () => {
-  files = []
-  filename = ""
-  loading = true
-  output = ""
-  error = ""
-  axios
-    .get<{ files: string[] }>("/api/agg/files")
-    .then((res) => {
-      const paths = res.data.files
-      files = paths.sort().map((path) => ({
-        name: path.replace("data/", ""),
-        path: path,
-        select: false,
-      }))
-    })
-    .catch((e: AxiosError) => {
-      error = e.message
-    })
-    .finally(() => {
-      loading = false
-    })
-}
-
-const selectAllFiles = () => {
-  files = files.map((file) => ({ ...file, select: true }))
-}
-
-const deselectAllFiles = () => {
-  files = files.map((file) => ({ ...file, select: false }))
-}
-
-const submitFiles = () => {
-  axios
-    .post<{ output: string }>("/api/agg", {
-      files: files.filter((file) => file.select).map((file) => file.path),
-      filename: filename,
-    })
-    .then((res) => {
-      output = res.data.output
-      error = ""
-    })
-    .catch((e: AxiosError<{ detail: string }>) => {
-      if (e.response) {
-        error = e.response.data.detail
-      } else {
+  const getFiles = () => {
+    files = []
+    filename = ""
+    loading = true
+    output = ""
+    error = ""
+    axios
+      .get<{ files: string[] }>("/api/agg/files")
+      .then((res) => {
+        const paths = res.data.files
+        files = paths.sort().map((path) => ({
+          name: path.replace("data/", ""),
+          path: path,
+          select: false,
+        }))
+      })
+      .catch((e: AxiosError) => {
         error = e.message
-      }
-    })
-}
+      })
+      .finally(() => {
+        loading = false
+      })
+  }
 
-onMount(getFiles)
+  const selectAllFiles = () => {
+    files = files.map((file) => ({ ...file, select: true }))
+  }
+
+  const deselectAllFiles = () => {
+    files = files.map((file) => ({ ...file, select: false }))
+  }
+
+  const submitFiles = () => {
+    axios
+      .post<{ output: string }>("/api/agg", {
+        files: files.filter((file) => file.select).map((file) => file.path),
+        filename: filename,
+      })
+      .then((res) => {
+        output = res.data.output
+        error = ""
+      })
+      .catch((e: AxiosError<{ detail: string }>) => {
+        if (e.response) {
+          error = e.response.data.detail
+        } else {
+          error = e.message
+        }
+      })
+  }
+
+  onMount(getFiles)
 </script>
 
 <div class="container">
@@ -130,7 +130,7 @@ onMount(getFiles)
 {/if}
 
 <style>
-.file-name {
-  margin: 0.5rem;
-}
+  .file-name {
+    margin: 0.5rem;
+  }
 </style>
