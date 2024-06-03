@@ -5,11 +5,6 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from libs import agg
-from utils import files
-
-
-class AggFiles(BaseModel):
-    files: list[str]
 
 
 class AggMain(BaseModel):
@@ -22,11 +17,6 @@ class AggMainRes(BaseModel):
 
 
 router = APIRouter(prefix="/agg")
-
-
-@router.get("/files", response_model=AggFiles)
-def agg_files() -> AggFiles:
-    return AggFiles(files=files("data", "*.csv"))
 
 
 @router.post("", response_model=AggMainRes)

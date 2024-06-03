@@ -25,7 +25,9 @@
     output = ""
     error = ""
     axios
-      .get<{ files: string[] }>("/api/agg/files")
+      .get<{ files: string[] }>("/api/utils/files", {
+        params: { path: "data", glob: "*.csv" },
+      })
       .then((res) => {
         const paths = res.data.files
         files = paths.sort().map((path) => ({
