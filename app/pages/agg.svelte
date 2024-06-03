@@ -1,9 +1,10 @@
 <script lang="ts">
-import axios, { type AxiosError, type AxiosResponse } from "axios"
+import axios, { type AxiosError } from "axios"
 import { onMount } from "svelte"
 
-interface File {
+type File = {
   name: string
+  path: string
   select: boolean
 }
 
@@ -24,10 +25,14 @@ const getFiles = () => {
   output = ""
   error = ""
   axios
-    .get("/api/agg/files")
-    .then((res: AxiosResponse<{ files: string[] }>) => {
-      const names = res.data.files
-      files = names.sort().map((name) => ({ name: name, select: false }))
+    .get<{ files: string[] }>("/api/agg/files")
+    .then((res) => {
+      const paths = res.data.files
+      files = paths.sort().map((path) => ({
+        name: path.replace("data/", ""),
+        path: path,
+        select: false,
+      }))
     })
     .catch((e: AxiosError) => {
       error = e.message
@@ -38,21 +43,20 @@ const getFiles = () => {
 }
 
 const selectAllFiles = () => {
-  files = files.map((file) => ({ name: file.name, select: true }))
+  files = files.map((file) => ({ ...file, select: true }))
 }
 
 const deselectAllFiles = () => {
-  files = files.map((file) => ({ name: file.name, select: false }))
+  files = files.map((file) => ({ ...file, select: false }))
 }
 
-const submitFiles = async (e: Event) => {
-  e.preventDefault()
+const submitFiles = () => {
   axios
-    .post("/api/agg", {
-      files: files.filter((file) => file.select).map((file) => file.name),
+    .post<{ output: string }>("/api/agg", {
+      files: files.filter((file) => file.select).map((file) => file.path),
       filename: filename,
     })
-    .then((res: AxiosResponse<{ output: string }>) => {
+    .then((res) => {
       output = res.data.output
       error = ""
     })
@@ -88,9 +92,12 @@ onMount(getFiles)
       <p>no files</p>
     </div>
   {:else}
-    <form class="pure-form pure-form-stacked pure-g" on:submit={submitFiles}>
+    <form
+      class="pure-form pure-form-stacked pure-g"
+      on:submit|preventDefault={submitFiles}
+    >
       <div class="pure-u-1 pure-u-sm-2-3 pure-u-md-1-2">
-        <div class="scroll-list">
+        <div class="border scroll-list">
           {#each files as file}
             <label class="pure-checkbox">
               <input type="checkbox" bind:checked={file.select} />

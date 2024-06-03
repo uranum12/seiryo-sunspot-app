@@ -20,8 +20,8 @@ main {
 }
 
 .border {
-  border: 2px solid;
-  border-radius: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
   padding: 0 1rem;
 }
 

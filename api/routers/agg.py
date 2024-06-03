@@ -34,7 +34,7 @@ def agg_main(body: AggMain) -> AggMainRes:
     output_dir = Path("out")
     output_dir.mkdir(exist_ok=True)
     output_path = output_dir / f"{body.filename}.parquet"
-    if (output_path).exists():
+    if output_path.exists():
         raise HTTPException(
             status_code=400, detail=f"file {output_path} already exists"
         )
