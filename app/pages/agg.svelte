@@ -10,10 +10,11 @@
 
   let files: File[] = []
   let filename = ""
-  let loading = false
+  let loadingFiles = false
   let submitDisabled: boolean
   let output = ""
   let error = ""
+  let loadingAgg = false
 
   $: submitDisabled =
     files.filter((file) => file.select).length === 0 || filename === ""
@@ -21,7 +22,7 @@
   const getFiles = () => {
     files = []
     filename = ""
-    loading = true
+    loadingFiles = true
     output = ""
     error = ""
     axios
@@ -40,7 +41,7 @@
         error = e.message
       })
       .finally(() => {
-        loading = false
+        loadingFiles = false
       })
   }
 
@@ -53,6 +54,7 @@
   }
 
   const submitFiles = () => {
+    loadingAgg = true
     axios
       .post<{ output: string }>("/api/agg", {
         files: files.filter((file) => file.select).map((file) => file.path),
@@ -68,6 +70,9 @@
         } else {
           error = e.message
         }
+      })
+      .finally(() => {
+        loadingAgg = false
       })
   }
 
@@ -87,7 +92,7 @@
 </div>
 
 <div class="container">
-  {#if loading}
+  {#if loadingFiles}
     <p>loading...</p>
   {:else if files.length === 0}
     <div class="border warning">
@@ -118,6 +123,10 @@
     </form>
   {/if}
 </div>
+
+{#if loadingAgg}
+  <p>loading...</p>
+{/if}
 
 {#if output !== ""}
   <div class="container border success">
