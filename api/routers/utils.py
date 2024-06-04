@@ -1,12 +1,7 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 from pydantic import BaseModel
-
-
-class FilesQuery(BaseModel):
-    path: str
-    glob: str
 
 
 class FilesRes(BaseModel):
@@ -17,11 +12,7 @@ router = APIRouter(prefix="/utils", tags=["utils"])
 
 
 @router.get("/files", response_model=FilesRes)
-def files(query: FilesQuery = Depends()) -> FilesRes:  # noqa: B008
+def files(path: str, glob: str) -> FilesRes:
     return FilesRes(
-        files=[
-            str(file)
-            for file in Path(query.path).glob(query.glob)
-            if file.is_file()
-        ]
+        files=[str(file) for file in Path(path).glob(glob) if file.is_file()]
     )
