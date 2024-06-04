@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte"
 
-  import Agg from "./pages/agg.svelte"
+  import Agg from "@/pages/agg.svelte"
 
   let page: string
 

@@ -1,4 +1,10 @@
 {
   "extends": ["@tsconfig/svelte/tsconfig.json"],
-  "include": ["app/**/*"]
+  "include": ["app/**/*"],
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["app/*"]
+    }
+  }
 }
