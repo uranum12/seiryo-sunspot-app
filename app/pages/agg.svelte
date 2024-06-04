@@ -2,13 +2,8 @@
   import axios, { type AxiosError } from "axios"
   import { onMount } from "svelte"
 
-  type File = {
-    name: string
-    path: string
-    select: boolean
-  }
-
-  let files: File[] = []
+  let files: string[] = []
+  let selected: string[] = []
   let filename = ""
   let loadingFiles = false
   let submitDisabled: boolean
@@ -16,11 +11,11 @@
   let error = ""
   let loadingAgg = false
 
-  $: submitDisabled =
-    files.filter((file) => file.select).length === 0 || filename === ""
+  $: submitDisabled = selected.length === 0 || filename === ""
 
   const getFiles = () => {
     files = []
+    selected = []
     filename = ""
     loadingFiles = true
     output = ""
@@ -30,12 +25,7 @@
         params: { path: "data", glob: "*.csv" },
       })
       .then((res) => {
-        const paths = res.data.files
-        files = paths.sort().map((path) => ({
-          name: path.replace("data/", ""),
-          path: path,
-          select: false,
-        }))
+        files = res.data.files.sort()
       })
       .catch((e: AxiosError) => {
         error = e.message
@@ -46,18 +36,18 @@
   }
 
   const selectAllFiles = () => {
-    files = files.map((file) => ({ ...file, select: true }))
+    selected = files
   }
 
   const deselectAllFiles = () => {
-    files = files.map((file) => ({ ...file, select: false }))
+    selected = []
   }
 
   const submitFiles = () => {
     loadingAgg = true
     axios
       .post<{ output: string }>("/api/agg", {
-        files: files.filter((file) => file.select).map((file) => file.path),
+        files: selected,
         filename: filename,
       })
       .then((res) => {
@@ -107,8 +97,8 @@
         <div class="border scroll-list">
           {#each files as file}
             <label class="pure-checkbox">
-              <input type="checkbox" bind:checked={file.select} />
-              <span class="file-name">{file.name}</span>
+              <input type="checkbox" bind:group={selected} value={file} />
+              <span class="file-name">{file.replace("data/", "")}</span>
             </label>
           {/each}
         </div>
