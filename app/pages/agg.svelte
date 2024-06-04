@@ -34,19 +34,6 @@
       .finally(() => {
         loadingFiles = false
       })
-    // axios
-    //   .get<{ files: string[] }>("/api/utils/files", {
-    //     params: { path: "data", glob: "*.csv" },
-    //   })
-    //   .then((res) => {
-    //     files = res.data.files.sort()
-    //   })
-    //   .catch((e: AxiosError) => {
-    //     error = e.message
-    //   })
-    //   .finally(() => {
-    //     loadingFiles = false
-    //   })
   }
 
   const selectAllFiles = () => {
@@ -77,25 +64,6 @@
       .finally(() => {
         loadingAgg = false
       })
-    // axios
-    //   .post<{ output: string }>("/api/agg", {
-    //     files: selected,
-    //     filename: filename,
-    //   })
-    //   .then((res) => {
-    //     output = res.data.output
-    //     error = ""
-    //   })
-    //   .catch((e: AxiosError<{ detail: string }>) => {
-    //     if (e.response) {
-    //       error = e.response.data.detail
-    //     } else {
-    //       error = e.message
-    //     }
-    //   })
-    //   .finally(() => {
-    //     loadingAgg = false
-    //   })
   }
 
   onMount(getFiles)
