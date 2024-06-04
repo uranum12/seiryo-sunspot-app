@@ -21,6 +21,11 @@ router = APIRouter(prefix="/agg")
 
 @router.post("", response_model=AggMainRes)
 def agg_main(body: AggMain) -> AggMainRes:
+    for file in body.files:
+        if not Path(file).exists():
+            raise HTTPException(
+                status_code=404, detail=f"file {file} not found"
+            )
     output_dir = Path("out")
     output_dir.mkdir(exist_ok=True)
     output_path = output_dir / f"{body.filename}.parquet"
