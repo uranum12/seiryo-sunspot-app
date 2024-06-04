@@ -10,7 +10,7 @@ indent_size = 4
 indent_style = space
 trim_trailing_whitespace = true
 
-[*.{html,js,css,svelte}]
+[*.{html,js,ts,css,svelte}]
 indent_size = 2
 indent_style = space
 trim_trailing_whitespace = true
