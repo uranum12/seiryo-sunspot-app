@@ -52,8 +52,8 @@ export function get<T, U = object>(path: string, params?: U): Promise<T> {
   )
 }
 
-export function post<T, U>(path: string, body: T): Promise<U> {
-  return http<U>(path, {
+export function post<T, U>(path: string, body: U): Promise<T> {
+  return http<T>(path, {
     method: "POST",
     body: buildBody(body),
     headers: {

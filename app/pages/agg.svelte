@@ -46,7 +46,7 @@
 
   const submitFiles = () => {
     loadingAgg = true
-    post<{ files: string[]; filename: string }, { output: string }>(
+    post<{ output: string }, { files: string[]; filename: string }>(
       "/api/agg",
       { files: selected, filename: filename }
     )
