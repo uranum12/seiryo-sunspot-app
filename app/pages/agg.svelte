@@ -1,133 +1,135 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-
   import { FetchError, get, post } from "@/utils/fetch"
 
-  let files: string[] = []
   let selected: string[] = []
   let filename = ""
-  let loadingFiles = false
+
   let submitDisabled: boolean
-  let output = ""
-  let error = ""
-  let loadingAgg = false
+  $: submitDisabled = selected.length === 0 || filename.trim() === ""
 
-  $: submitDisabled = selected.length === 0 || filename === ""
-
-  const getFiles = () => {
-    files = []
-    selected = []
-    filename = ""
-    loadingFiles = true
-    output = ""
-    error = ""
-    get<{ files: string[] }, { path: string; glob: string }>(
+  const getFiles = async (): Promise<string[]> => {
+    const res = await get<{ files: string[] }, { path: string; glob: string }>(
       "/api/utils/files",
       { path: "data", glob: "*.csv" }
     )
-      .then((res) => {
-        files = res.files.sort()
-      })
-      .catch((e) => {
-        error = e.message
-      })
-      .finally(() => {
-        loadingFiles = false
-      })
+    return res.files.sort()
   }
 
-  const selectAllFiles = () => {
-    selected = files
+  const postAgg = async (): Promise<string> => {
+    const res = await post<
+      { output: string },
+      { files: string[]; filename: string }
+    >("/api/agg", { files: selected, filename: filename })
+    return res.output
   }
 
-  const deselectAllFiles = () => {
+  let filesPromise: Promise<string[]> = getFiles()
+  let aggPromise: Promise<string> | undefined = undefined
+
+  const fetchFiles = () => {
     selected = []
+    filename = ""
+    aggPromise = undefined
+    filesPromise = getFiles()
   }
 
-  const submitFiles = () => {
-    loadingAgg = true
-    post<{ output: string }, { files: string[]; filename: string }>(
-      "/api/agg",
-      { files: selected, filename: filename }
-    )
-      .then((res) => {
-        output = res.output
-        error = ""
-      })
-      .catch((e) => {
-        if (e instanceof FetchError) {
-          error = e.detail
-        } else {
-          error = e.message
-        }
-      })
-      .finally(() => {
-        loadingAgg = false
-      })
+  const submitAgg = () => {
+    aggPromise = postAgg()
   }
-
-  onMount(getFiles)
 </script>
 
-<div class="container">
-  <button class="pure-button" on:click={getFiles}>refresh files</button>
+{#await filesPromise}
+  <p>loading...</p>
+{:then files}
   {#if files.length !== 0}
-    <button class="pure-button" on:click={selectAllFiles}
-      >select all files</button
-    >
-    <button class="pure-button" on:click={deselectAllFiles}
-      >deselect all files</button
-    >
-  {/if}
-</div>
-
-<div class="container">
-  {#if loadingFiles}
-    <p>loading...</p>
-  {:else if files.length === 0}
-    <div class="border warning">
-      <p>no files</p>
+    <div class="container">
+      <button class="pure-button" on:click={fetchFiles}>refresh files</button>
+      <button
+        class="pure-button"
+        on:click={() => {
+          selected = files
+        }}>select all files</button
+      >
+      <button
+        class="pure-button"
+        on:click={() => {
+          selected = []
+        }}>deselect all files</button
+      >
+    </div>
+    <div class="container">
+      <div class="pure-u-1 pure-u-sm-2-3 pure-u-md-1-2">
+        <form
+          class="pure-form pure-form-stacked pure-g"
+          on:submit|preventDefault={submitAgg}
+        >
+          <div class="pure-u-1 border scroll-list">
+            {#each files as file}
+              <label class="pure-checkbox">
+                <input type="checkbox" bind:group={selected} value={file} />
+                <span class="file-name">{file.replace("data/", "")}</span>
+              </label>
+            {/each}
+          </div>
+          <input
+            placeholder="Output File Name"
+            required
+            class="pure-input-1"
+            bind:value={filename}
+          />
+          <button type="submit" class="pure-button" disabled={submitDisabled}
+            >Submit</button
+          >
+        </form>
+      </div>
     </div>
   {:else}
-    <form
-      class="pure-form pure-form-stacked pure-g"
-      on:submit|preventDefault={submitFiles}
-    >
-      <div class="pure-u-1 pure-u-sm-2-3 pure-u-md-1-2">
-        <div class="border scroll-list">
-          {#each files as file}
-            <label class="pure-checkbox">
-              <input type="checkbox" bind:group={selected} value={file} />
-              <span class="file-name">{file.replace("data/", "")}</span>
-            </label>
-          {/each}
-        </div>
-        <input
-          placeholder="output file name"
-          required
-          class="pure-input-1"
-          bind:value={filename}
-        />
-        <button class="pure-button" disabled={submitDisabled}>submit</button>
+    <div class="container">
+      <button class="pure-button" on:click={fetchFiles}
+        >retry fetch files</button
+      >
+    </div>
+    <div class="container">
+      <div class="border warning">
+        <p>no files</p>
       </div>
-    </form>
+    </div>
   {/if}
-</div>
-
-{#if loadingAgg}
-  <p>loading...</p>
-{/if}
-
-{#if output !== ""}
-  <div class="container border success">
-    <p>file {output} generated</p>
+{:catch e}
+  <div class="container">
+    <button class="pure-button" on:click={fetchFiles}>retry fetch files</button>
   </div>
-{/if}
-
-{#if error !== ""}
-  <div class="container border error">
-    <p>{error}</p>
+  <div class="container">
+    <div class="border error">
+      <p>{e.message}</p>
+    </div>
   </div>
+{/await}
+
+{#if aggPromise}
+  {#await aggPromise}
+    <p>loading...</p>
+  {:then output}
+    <div class="container">
+      <div class="border success">
+        <p>file {output} generated</p>
+      </div>
+    </div>
+  {:catch e}
+    {#if e instanceof FetchError}
+      <div class="container">
+        <div class="border error">
+          <p>{e.detail}</p>
+        </div>
+      </div>
+    {:else}
+      <div class="container">
+        <div class="border error">
+          <p>{e.message}</p>
+        </div>
+      </div>
+    {/if}
+  {/await}
 {/if}
 
 <style>
