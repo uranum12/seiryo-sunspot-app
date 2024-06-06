@@ -24,7 +24,7 @@
   }
 
   let filesPromise: Promise<string[]> = getFiles()
-  let aggPromise: Promise<string> | undefined = undefined
+  let aggPromise: Promise<string> | undefined
 
   const fetchFiles = () => {
     selected = []
@@ -44,17 +44,11 @@
   {#if files.length !== 0}
     <div class="container">
       <button class="pure-button" on:click={fetchFiles}>refresh files</button>
-      <button
-        class="pure-button"
-        on:click={() => {
-          selected = files
-        }}>select all files</button
+      <button class="pure-button" on:click={() => (selected = files)}
+        >select all files</button
       >
-      <button
-        class="pure-button"
-        on:click={() => {
-          selected = []
-        }}>deselect all files</button
+      <button class="pure-button" on:click={() => (selected = [])}
+        >deselect all files</button
       >
     </div>
     <div class="container">
@@ -116,19 +110,11 @@
       </div>
     </div>
   {:catch e}
-    {#if e instanceof FetchError}
-      <div class="container">
-        <div class="border error">
-          <p>{e.detail}</p>
-        </div>
+    <div class="container">
+      <div class="border error">
+        <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </div>
-    {:else}
-      <div class="container">
-        <div class="border error">
-          <p>{e.message}</p>
-        </div>
-      </div>
-    {/if}
+    </div>
   {/await}
 {/if}
 
