@@ -1,4 +1,7 @@
 <script lang="ts">
+  import Alert from "@/components/alert.svelte"
+  import Container from "@/components/container.svelte"
+  import ScrollBox from "@/components/scroll_box.svelte"
   import { FetchError, get, post } from "@/utils/fetch"
 
   let selected: string[] = []
@@ -42,7 +45,7 @@
   <p>loading...</p>
 {:then files}
   {#if files.length !== 0}
-    <div class="container">
+    <Container>
       <button class="pure-button" on:click={fetchFiles}>refresh files</button>
       <button class="pure-button" on:click={() => (selected = files)}
         >select all files</button
@@ -50,20 +53,22 @@
       <button class="pure-button" on:click={() => (selected = [])}
         >deselect all files</button
       >
-    </div>
-    <div class="container">
+    </Container>
+    <Container>
       <div class="pure-u-1 pure-u-sm-2-3 pure-u-md-1-2">
         <form
           class="pure-form pure-form-stacked pure-g"
           on:submit|preventDefault={submitAgg}
         >
-          <div class="pure-u-1 border scroll-list">
-            {#each files as file}
-              <label class="pure-checkbox">
-                <input type="checkbox" bind:group={selected} value={file} />
-                <span class="file-name">{file.replace("data/", "")}</span>
-              </label>
-            {/each}
+          <div class="pure-u-1">
+            <ScrollBox>
+              {#each files as file}
+                <label class="pure-checkbox">
+                  <input type="checkbox" bind:group={selected} value={file} />
+                  <span class="file-name">{file.replace("data/", "")}</span>
+                </label>
+              {/each}
+            </ScrollBox>
           </div>
           <input
             placeholder="Output File Name"
@@ -76,45 +81,45 @@
           >
         </form>
       </div>
-    </div>
+    </Container>
   {:else}
-    <div class="container">
+    <Container>
       <button class="pure-button" on:click={fetchFiles}
         >retry fetch files</button
       >
-    </div>
-    <div class="container">
-      <div class="border warning">
+    </Container>
+    <Container>
+      <Alert severity="warning">
         <p>no files</p>
-      </div>
-    </div>
+      </Alert>
+    </Container>
   {/if}
 {:catch e}
-  <div class="container">
+  <Container>
     <button class="pure-button" on:click={fetchFiles}>retry fetch files</button>
-  </div>
-  <div class="container">
-    <div class="border error">
+  </Container>
+  <Container>
+    <Alert severity="error">
       <p>{e.message}</p>
-    </div>
-  </div>
+    </Alert>
+  </Container>
 {/await}
 
 {#if aggPromise}
   {#await aggPromise}
     <p>loading...</p>
   {:then output}
-    <div class="container">
-      <div class="border success">
+    <Container>
+      <Alert severity="success">
         <p>file {output} generated</p>
-      </div>
-    </div>
+      </Alert>
+    </Container>
   {:catch e}
-    <div class="container">
-      <div class="border error">
+    <Container>
+      <Alert severity="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
-      </div>
-    </div>
+      </Alert>
+    </Container>
   {/await}
 {/if}
 
