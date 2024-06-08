@@ -1,11 +1,15 @@
 <script lang="ts">
   import Alert from "@/components/alert.svelte"
+  import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import Container from "@/components/container.svelte"
   import ScrollBox from "@/components/scroll_box.svelte"
   import { FetchError, get, post } from "@/utils/fetch"
 
   let selected: string[] = []
   let filename = ""
+  let overwrite = false
+
+  let showConfirmOverwrite = false
 
   let submitDisabled: boolean
   $: submitDisabled = selected.length === 0 || filename.trim() === ""
@@ -21,8 +25,8 @@
   const postAgg = async (): Promise<string> => {
     const res = await post<
       { output: string },
-      { files: string[]; filename: string }
-    >("/api/agg", { files: selected, filename: filename })
+      { files: string[]; filename: string; overwrite: boolean }
+    >("/api/agg", { files: selected, filename: filename, overwrite: overwrite })
     return res.output
   }
 
@@ -32,11 +36,21 @@
   const fetchFiles = () => {
     selected = []
     filename = ""
+    overwrite = false
     aggPromise = undefined
     filesPromise = getFiles()
   }
 
   const submitAgg = () => {
+    if (overwrite) {
+      aggPromise = undefined
+      showConfirmOverwrite = true
+    } else {
+      aggPromise = postAgg()
+    }
+  }
+
+  const okOverwrite = () => {
     aggPromise = postAgg()
   }
 </script>
@@ -76,12 +90,19 @@
             class="pure-input-1"
             bind:value={filename}
           />
+          <label class="pure-checkbox pure-u-1">
+            <input type="checkbox" bind:checked={overwrite} />
+            <span>Overwrite</span>
+          </label>
           <button type="submit" class="pure-button" disabled={submitDisabled}
             >Submit</button
           >
         </form>
       </div>
     </Container>
+    <ConfirmDialog bind:isOpen={showConfirmOverwrite} on:ok={okOverwrite}>
+      Are you sure you want me to overwrite file {filename}.parquet ?
+    </ConfirmDialog>
   {:else}
     <Container>
       <button class="pure-button" on:click={fetchFiles}
