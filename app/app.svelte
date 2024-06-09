@@ -14,11 +14,21 @@
 
 <svelte:window on:hashchange={getPageName} />
 
-<main>
-  <a href="/#">home</a>
-  <a href="/#agg">agg</a>
-  <a href="/docs">api docs</a>
+<header>
+  <div class="pure-menu pure-menu-horizontal">
+    <a href="/#" class="pure-menu-heading pure-menu-link">home</a>
+    <ul class="pure-menu-list">
+      <li class="pure-menu-item">
+        <a href="/#agg" class="pure-menu-link">agg</a>
+      </li>
+      <li class="pure-menu-item">
+        <a href="/docs" class="pure-menu-link">api docs</a>
+      </li>
+    </ul>
+  </div>
+</header>
 
+<main>
   {#if page === ""}
     <div class="container">
       <h1>hello world!</h1>
@@ -33,6 +43,9 @@
 </main>
 
 <style>
+  header {
+    height: fit-content;
+  }
   main {
     padding-left: 2rem;
     padding-right: 2rem;
