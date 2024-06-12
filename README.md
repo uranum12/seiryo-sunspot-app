@@ -11,12 +11,13 @@ pnpm install
 ### build
 
 ```sh
-pnpm build
+node ./build.js
 ```
 
 ### develop
 
 ```sh
+NODE_ENV="development" node ./build.js
 pnpm fmt
 pnpm lint
 pnpm fix

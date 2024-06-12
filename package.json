@@ -22,7 +22,6 @@
   },
   "packageManager": "pnpm@9.3.0",
   "scripts": {
-    "build": "node ./build.js",
     "fmt": "biome format --write . && prettier --write **/*.{toml,html,svelte}",
     "lint": "biome check app && svelte-check",
     "fix": "biome check --write app"

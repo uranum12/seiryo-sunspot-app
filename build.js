@@ -3,28 +3,47 @@ import esbuild from "esbuild"
 import sveltePlugin from "esbuild-svelte"
 import sveltePreprocess from "svelte-preprocess"
 
+const isDev = process.env.NODE_ENV === "development"
+
 if (!fs.existsSync("dist")) {
   fs.mkdirSync("dist")
 }
-
-esbuild
-  .build({
-    entryPoints: ["app/main.ts"],
-    mainFields: ["svelte", "browser", "module", "main"],
-    conditions: ["svelte", "browser"],
-    outdir: "dist",
-    bundle: true,
-    minify: true,
-    plugins: [
-      sveltePlugin({
-        preprocess: sveltePreprocess(),
-      }),
-    ],
-    logLevel: "info",
-  })
-  .catch((err) => {
-    console.error(err)
-    process.exit(1)
-  })
-
 fs.cpSync("app/static", "dist", { recursive: true })
+
+/** @type {import("esbuild").BuildOptions} */
+const config = {
+  entryPoints: ["app/main.ts"],
+  mainFields: ["svelte", "browser", "module", "main"],
+  conditions: ["svelte", "browser"],
+  outdir: "dist",
+  bundle: true,
+  minify: true,
+  sourcemap: isDev,
+  metafile: isDev,
+  plugins: [
+    sveltePlugin({
+      preprocess: sveltePreprocess(),
+    }),
+    {
+      name: "on-end",
+      setup(build) {
+        build.onEnd((result) => {
+          if (result.metafile) {
+            fs.writeFileSync(
+              "dist/metafile.json",
+              JSON.stringify(result.metafile),
+            )
+          }
+        })
+      },
+    },
+  ],
+  logLevel: "info",
+}
+
+if (isDev) {
+  const ctx = await esbuild.context(config)
+  await ctx.watch()
+} else {
+  await esbuild.build(config)
+}
