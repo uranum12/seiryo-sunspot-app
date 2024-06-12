@@ -69,36 +69,34 @@
       >
     </Container>
     <Container>
-      <div class="pure-u-1 pure-u-sm-2-3 pure-u-md-1-2">
-        <form
-          class="pure-form pure-form-stacked pure-g"
-          on:submit|preventDefault={submitAgg}
+      <form
+        class="pure-form pure-form-stacked pure-g"
+        on:submit|preventDefault={submitAgg}
+      >
+        <div class="pure-u-1">
+          <ScrollBox>
+            {#each files as file}
+              <label class="pure-checkbox">
+                <input type="checkbox" bind:group={selected} value={file} />
+                <span class="file-name">{file.replace("data/", "")}</span>
+              </label>
+            {/each}
+          </ScrollBox>
+        </div>
+        <input
+          placeholder="Output File Name"
+          required
+          class="pure-input-1"
+          bind:value={filename}
+        />
+        <label class="pure-checkbox pure-u-1">
+          <input type="checkbox" bind:checked={overwrite} />
+          <span>Overwrite</span>
+        </label>
+        <button type="submit" class="pure-button" disabled={submitDisabled}
+          >Submit</button
         >
-          <div class="pure-u-1">
-            <ScrollBox>
-              {#each files as file}
-                <label class="pure-checkbox">
-                  <input type="checkbox" bind:group={selected} value={file} />
-                  <span class="file-name">{file.replace("data/", "")}</span>
-                </label>
-              {/each}
-            </ScrollBox>
-          </div>
-          <input
-            placeholder="Output File Name"
-            required
-            class="pure-input-1"
-            bind:value={filename}
-          />
-          <label class="pure-checkbox pure-u-1">
-            <input type="checkbox" bind:checked={overwrite} />
-            <span>Overwrite</span>
-          </label>
-          <button type="submit" class="pure-button" disabled={submitDisabled}
-            >Submit</button
-          >
-        </form>
-      </div>
+      </form>
     </Container>
     <ConfirmDialog bind:isOpen={showConfirmOverwrite} on:ok={okOverwrite}>
       Are you sure you want me to overwrite file {filename}.parquet ?
