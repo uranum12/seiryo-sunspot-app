@@ -8,11 +8,11 @@
     "snakecase-keys": "^8.0.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.8.0",
+    "@biomejs/biome": "^1.8.1",
     "@tsconfig/svelte": "^5.0.4",
-    "esbuild": "^0.21.4",
+    "esbuild": "^0.21.5",
     "esbuild-svelte": "^0.8.1",
-    "prettier": "^3.3.1",
+    "prettier": "^3.3.2",
     "prettier-plugin-svelte": "^3.2.4",
     "prettier-plugin-toml": "^2.0.1",
     "svelte": "^4.2.18",
@@ -20,7 +20,7 @@
     "svelte-preprocess": "^5.1.4",
     "typescript": "^5.4.5"
   },
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "pnpm@9.3.0",
   "scripts": {
     "build": "node ./build.js",
     "fmt": "biome format --write . && prettier --write **/*.{toml,html,svelte}",
