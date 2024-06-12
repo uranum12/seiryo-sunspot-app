@@ -1,21 +1,43 @@
 <script lang="ts">
+  import Accordion from "@/components/accordion.svelte"
   import Alert from "@/components/alert.svelte"
 
   export let files: string[]
   export let selected: string[]
 
+  let filtered: string[] = files.sort()
+  let filter = ""
+
+  const filterApply = () => {
+    filtered = files.filter((file) =>
+      file.replace(/^data\//, "").includes(filter)
+    )
+  }
+
+  const filterClear = () => {
+    filter = ""
+    filterApply()
+  }
+
   const selectAll = () => {
-    selected = files
+    selected = selected.concat(filtered)
   }
 
   const deselectAll = () => {
-    selected = []
+    selected = selected.filter((file) => !filtered.includes(file))
   }
 </script>
 
-{#if files.length === 0}
+<Accordion>
+  <span slot="summary">filter</span>
+  <input class="pure-input-1 filter-input" bind:value={filter} />
+  <button class="pure-button" on:click={filterApply}>apply</button>
+  <button class="pure-button" on:click={filterClear}>clear</button>
+</Accordion>
+
+{#if filtered.length === 0}
   <Alert severity="warning">
-    <p>no files</p>
+    <p>no files matched</p>
   </Alert>
 {:else}
   <div>
@@ -26,7 +48,7 @@
   </div>
 
   <div class="pure-u-1 scroll-box">
-    {#each files.sort() as file}
+    {#each filtered as file}
       <label>
         <input type="checkbox" bind:group={selected} value={file} />
         <span class="file-name">{file.replace(/^data\//, "")}</span>
@@ -36,6 +58,9 @@
 {/if}
 
 <style>
+  .filter-input {
+    margin-top: 0 !important;
+  }
   .scroll-box {
     border: 1px solid #ccc;
     border-radius: 4px;
