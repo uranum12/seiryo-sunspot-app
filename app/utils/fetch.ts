@@ -1,5 +1,4 @@
-import camelcaseKeys from "camelcase-keys"
-import snakecaseKeys from "snakecase-keys"
+import { toCamelCase, toSnakeCase } from "./convert_case"
 
 export class FetchError extends Error {
   public status: number
@@ -17,7 +16,7 @@ function buildBody<T = object>(body: T): string | null {
     return null
   }
 
-  return JSON.stringify(snakecaseKeys(body))
+  return JSON.stringify(toSnakeCase(body))
 }
 
 function buildPathWithParams<T = object>(path: string, params?: T): string {
@@ -43,12 +42,12 @@ export async function http<T>(path: string, options?: RequestInit): Promise<T> {
     throw new FetchError(res.status, data.detail)
   }
 
-  return camelcaseKeys(await res.json(), { deep: true })
+  return toCamelCase(await res.json())
 }
 
 export function get<T, U = object>(path: string, params?: U): Promise<T> {
   return http<T>(
-    buildPathWithParams(path, params ? snakecaseKeys(params) : undefined),
+    buildPathWithParams(path, params ? toSnakeCase(params) : undefined),
   )
 }
 

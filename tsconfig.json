@@ -2,6 +2,7 @@
   "extends": ["@tsconfig/svelte/tsconfig.json"],
   "include": ["app/**/*"],
   "compilerOptions": {
+    "target": "es2020",
     "baseUrl": "./",
     "paths": {
       "@/*": ["app/*"]
