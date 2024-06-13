@@ -65,10 +65,6 @@
   </div>
 {/if}
 
-{#each selected as file}
-  <p>{file}</p>
-{/each}
-
 <style>
   .filter-input {
     margin-top: 0 !important;
