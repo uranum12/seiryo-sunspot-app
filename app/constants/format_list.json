@@ -1,0 +1,34 @@
+[
+  {
+    "description": "Portable Document Format",
+    "format": "pdf"
+  },
+  {
+    "description": "Portable Network Graphics",
+    "format": "png"
+  },
+  {
+    "description": "Joint Photographic Experts Group",
+    "format": "jpg"
+  },
+  {
+    "description": "Encapsulated Postscript",
+    "format": "eps"
+  },
+  {
+    "description": "Postscript",
+    "format": "ps"
+  },
+  {
+    "description": "Scalable Vector Graphics",
+    "format": "svg"
+  },
+  {
+    "description": "Tagged Image File Format",
+    "format": "tif"
+  },
+  {
+    "description": "WebP Image Format",
+    "format": "webp"
+  }
+]

@@ -9,6 +9,7 @@
 <script lang="ts">
   import { createEventDispatcher } from "svelte"
 
+  import formatList from "@/constants/format_list.json"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import Container from "@/components/container.svelte"
 
@@ -46,9 +47,11 @@
   <div class="pure-form pure-form-stacked">
     <select class="pure-input-1" bind:value={format}>
       <option value="" selected disabled>select file format</option>
-      <option>png</option>
-      <option>pdf</option>
-      <option>eps</option>
+      {#each formatList as format}
+        <option value={format.format}>
+          {format.description} ({format.format})
+        </option>
+      {/each}
     </select>
     <label class="pure-checkbox pure-input-1">
       <input type="checkbox" bind:checked={overwrite} />
