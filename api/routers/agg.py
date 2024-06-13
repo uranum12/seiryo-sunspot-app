@@ -17,7 +17,7 @@ class AggMainRes(BaseModel):
     output: str
 
 
-router = APIRouter(prefix="/agg")
+router = APIRouter(prefix="/agg", tags=["agg"])
 
 
 @router.post("", response_model=AggMainRes)
