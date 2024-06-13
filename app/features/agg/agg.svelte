@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { onMount } from "svelte"
+
   import Alert from "@/components/alert.svelte"
   import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
@@ -7,8 +9,8 @@
   import { getFiles } from "./api/files"
   import FileForm, { type FormInput } from "./components/file_form.svelte"
 
-  let filesPromise: Promise<string[]> = getFiles()
-  let aggPromise: Promise<string> | undefined
+  let filesPromise: ReturnType<typeof getFiles>
+  let aggPromise: ReturnType<typeof postAgg> | undefined
 
   const fetchFiles = () => {
     aggPromise = undefined
@@ -16,40 +18,37 @@
   }
 
   const submitAgg = (e: CustomEvent<FormInput>) => {
-    aggPromise = postAgg({ ...e.detail })
+    aggPromise = postAgg(e.detail)
   }
+
+  onMount(fetchFiles)
 </script>
 
-{#await filesPromise}
-  <p>loading...</p>
-{:then files}
-  {#if files.length !== 0}
+<Container>
+  <button class="pure-button" on:click={fetchFiles}>refresh files</button>
+</Container>
+
+{#if filesPromise}
+  {#await filesPromise}
+    <p>loading...</p>
+  {:then files}
+    {#if files.length !== 0}
+      <FileForm {files} on:submit={submitAgg} />
+    {:else}
+      <Container>
+        <Alert severity="warning">
+          <p>no files</p>
+        </Alert>
+      </Container>
+    {/if}
+  {:catch e}
     <Container>
-      <button class="pure-button" on:click={fetchFiles}>refresh files</button>
-    </Container>
-    <FileForm {files} on:submit={submitAgg} />
-  {:else}
-    <Container>
-      <button class="pure-button" on:click={fetchFiles}
-        >retry fetch files</button
-      >
-    </Container>
-    <Container>
-      <Alert severity="warning">
-        <p>no files</p>
+      <Alert severity="error">
+        <p>{e.message}</p>
       </Alert>
     </Container>
-  {/if}
-{:catch e}
-  <Container>
-    <button class="pure-button" on:click={fetchFiles}>retry fetch files</button>
-  </Container>
-  <Container>
-    <Alert severity="error">
-      <p>{e.message}</p>
-    </Alert>
-  </Container>
-{/await}
+  {/await}
+{/if}
 
 {#if aggPromise}
   {#await aggPromise}

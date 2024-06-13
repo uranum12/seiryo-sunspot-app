@@ -6,10 +6,14 @@
   export let selected: string[]
 
   let filtered: string[] = files.sort()
+  let checked: string[] = []
   let filter = ""
 
   const filterApply = () => {
     filtered = files.filter((file) =>
+      file.replace(/^data\//, "").includes(filter)
+    )
+    checked = selected.filter((file) =>
       file.replace(/^data\//, "").includes(filter)
     )
   }
@@ -20,12 +24,16 @@
   }
 
   const selectAll = () => {
-    selected = selected.concat(filtered)
+    checked = Array.from(new Set([...checked, ...filtered]))
   }
 
   const deselectAll = () => {
-    selected = selected.filter((file) => !filtered.includes(file))
+    checked = checked.filter((file) => !filtered.includes(file))
   }
+
+  $: selected = checked.concat(
+    selected.filter((file) => !filtered.includes(file))
+  )
 </script>
 
 <Accordion>
@@ -50,18 +58,23 @@
   <div class="pure-u-1 scroll-box">
     {#each filtered as file}
       <label>
-        <input type="checkbox" bind:group={selected} value={file} />
+        <input type="checkbox" bind:group={checked} value={file} />
         <span class="file-name">{file.replace(/^data\//, "")}</span>
       </label>
     {/each}
   </div>
 {/if}
 
+{#each selected as file}
+  <p>{file}</p>
+{/each}
+
 <style>
   .filter-input {
     margin-top: 0 !important;
   }
   .scroll-box {
+    box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 0 1rem;
