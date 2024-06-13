@@ -8,6 +8,7 @@ uvicorn = { extras = ["standard"], version = "^0.29.0" }
 fastapi = "^0.111.0"
 pydantic = "^2.7.1"
 polars = "^0.20.30"
+matplotlib = "^3.9.0"
 
 [tool.poetry.group.dev.dependencies]
 invoke = "*"

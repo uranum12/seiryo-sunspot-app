@@ -2,6 +2,9 @@
   import { onMount } from "svelte"
 
   import Agg from "@/features/agg/agg.svelte"
+  import SunspotNumberAgg from "@/features/sunspot_number/agg.svelte"
+  import SunspotNumberWholeDisk from "@/features/sunspot_number/whole_disk.svelte"
+  import SunspotNumberHemispheric from "@/features/sunspot_number/hemispheric.svelte"
 
   let page: string
 
@@ -35,6 +38,12 @@
     </div>
   {:else if page === "agg"}
     <Agg />
+  {:else if page === "sunspot_number/agg"}
+    <SunspotNumberAgg />
+  {:else if page === "sunspot_number/whole_disk"}
+    <SunspotNumberWholeDisk />
+  {:else if page === "sunspot_number/hemispheric"}
+    <SunspotNumberHemispheric />
   {:else}
     <div class="container">
       <h2>Error: Not Found!</h2>
