@@ -53,6 +53,12 @@
         </option>
       {/each}
     </select>
+    <input
+      type="number"
+      class="pure-input-1"
+      placeholder="dpi"
+      bind:value={dpi}
+    />
     <label class="pure-checkbox pure-input-1">
       <input type="checkbox" bind:checked={overwrite} />
       <span>Overwrite</span>
