@@ -7,40 +7,42 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import Container from "@/components/container.svelte"
 
   import FilesSelector from "./files_selector.svelte"
 
-  export let files: string[]
-
-  const dispatch = createEventDispatcher<{ submit: FormInput }>()
-
-  let selected: string[] = []
-  let filename = ""
-  let overwrite = false
-
-  let showConfirmOverwrite = false
-
-  let submitDisabled: boolean
-  $: submitDisabled = selected.length === 0 || filename.trim() === ""
-
-  const dispatchSubmit = () => {
-    dispatch("submit", { files: selected, filename, overwrite })
+  type Props = {
+    files: string[]
+    onSubmit: (input: FormInput) => void
   }
 
-  const onSubmit = () => {
+  let { files, onSubmit }: Props = $props()
+
+  let selected = $state<string[]>([])
+  let filename = $state<string>("")
+  let overwrite = $state<boolean>(false)
+
+  let showConfirmOverwrite = $state<boolean>(false)
+
+  const submitDisabled = $derived<boolean>(
+    selected.length === 0 || filename.trim() === ""
+  )
+
+  const submit = () => {
+    onSubmit({ files: selected, filename, overwrite })
+  }
+
+  const onClickSubmit = () => {
     if (overwrite) {
       showConfirmOverwrite = true
     } else {
-      dispatchSubmit()
+      submit()
     }
   }
 
   const confirmOverwrite = () => {
-    dispatchSubmit()
+    submit()
   }
 </script>
 
@@ -57,7 +59,11 @@
       <input type="checkbox" bind:checked={overwrite} />
       <span>Overwrite</span>
     </label>
-    <button class="pure-button" disabled={submitDisabled} on:click={onSubmit}>
+    <button
+      class="pure-button"
+      disabled={submitDisabled}
+      onclick={onClickSubmit}
+    >
       submit
     </button>
   </div>
