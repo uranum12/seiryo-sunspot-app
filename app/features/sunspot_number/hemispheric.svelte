@@ -51,14 +51,14 @@
       <PreviewForm {files} on:submit={fetchPreview} />
     {:else}
       <Container>
-        <Alert severity="warning">
+        <Alert type="warning">
           <p>no files</p>
         </Alert>
       </Container>
     {/if}
   {:catch e}
     <Container>
-      <Alert severity="error">
+      <Alert type="error">
         <p>{e.message}</p>
       </Alert>
     </Container>
@@ -79,7 +79,7 @@
     <SaveForm {filename} on:submit={submitSave} />
   {:catch e}
     <Container>
-      <Alert severity="error">
+      <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
     </Container>
@@ -91,13 +91,13 @@
     <p>loading...</p>
   {:then output}
     <Container>
-      <Alert severity="success">
+      <Alert type="success">
         <p>file {output} generated</p>
       </Alert>
     </Container>
   {:catch e}
     <Container>
-      <Alert severity="error">
+      <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
     </Container>

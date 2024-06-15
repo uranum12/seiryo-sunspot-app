@@ -2,11 +2,11 @@
   import type { Snippet } from "svelte"
 
   type Props = {
-    severity: "success" | "warning" | "error"
+    type: "success" | "warning" | "error"
     children: Snippet
   }
 
-  let { severity, children }: Props = $props()
+  let { type: severity, children }: Props = $props()
 </script>
 
 <div class="alert {severity}">

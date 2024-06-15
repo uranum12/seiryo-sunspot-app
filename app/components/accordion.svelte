@@ -2,7 +2,7 @@
   import type { Snippet } from "svelte"
 
   type Props = {
-    summary: Snippet
+    summary: string
     children: Snippet
   }
 
@@ -11,7 +11,7 @@
 
 <details>
   <summary>
-    {@render summary()}
+    {summary}
   </summary>
   <div>
     {@render children()}

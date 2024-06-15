@@ -44,17 +44,14 @@
   }
 </script>
 
-<Accordion>
-  {#snippet summary()}
-    <span>filter</span>
-  {/snippet}
+<Accordion summary="filter">
   <input class="pure-input-1 filter-input" bind:value={filter} />
   <button class="pure-button" onclick={filterApply}>apply</button>
   <button class="pure-button" onclick={filterClear}>clear</button>
 </Accordion>
 
 {#if filtered.length === 0}
-  <Alert severity="warning">
+  <Alert type="warning">
     <p>no files matched</p>
   </Alert>
 {:else}

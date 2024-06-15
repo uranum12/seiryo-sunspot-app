@@ -36,14 +36,14 @@
       <FileForm {files} on:submit={submitAgg} />
     {:else}
       <Container>
-        <Alert severity="warning">
+        <Alert type="warning">
           <p>no files</p>
         </Alert>
       </Container>
     {/if}
   {:catch e}
     <Container>
-      <Alert severity="error">
+      <Alert type="error">
         <p>{e.message}</p>
       </Alert>
     </Container>
@@ -55,7 +55,7 @@
     <p>loading...</p>
   {:then output}
     <Container>
-      <Alert severity="success">
+      <Alert type="success">
         <p>file {output.outputRaw} generated</p>
         <p>file {output.outputDaily} generated</p>
         <p>file {output.outputMonthly} generated</p>
@@ -63,7 +63,7 @@
     </Container>
   {:catch e}
     <Container>
-      <Alert severity="error">
+      <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
     </Container>
