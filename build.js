@@ -20,7 +20,11 @@ const config = {
   sourcemap: isDev,
   metafile: isDev,
   plugins: [
-    sveltePlugin(),
+    sveltePlugin({
+      compilerOptions: {
+        runes: true,
+      },
+    }),
     {
       name: "on-end",
       setup(build) {
