@@ -1,18 +1,16 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-
   import Agg from "@/features/agg/agg.svelte"
   import SunspotNumberAgg from "@/features/sunspot_number/agg.svelte"
-  import SunspotNumberWholeDisk from "@/features/sunspot_number/whole_disk.svelte"
   import SunspotNumberHemispheric from "@/features/sunspot_number/hemispheric.svelte"
+  import SunspotNumberWholeDisk from "@/features/sunspot_number/whole_disk.svelte"
 
-  let page: string
+  let page = $state<string>("")
 
   const getPageName = () => {
     page = location.hash.replace("#", "")
   }
 
-  onMount(getPageName)
+  $effect(getPageName)
 </script>
 
 <svelte:window on:hashchange={getPageName} />
@@ -33,9 +31,7 @@
 
 <main>
   {#if page === ""}
-    <div class="container">
-      <h1>hello world!</h1>
-    </div>
+    <h1>hello world!</h1>
   {:else if page === "agg"}
     <Agg />
   {:else if page === "sunspot_number/agg"}
