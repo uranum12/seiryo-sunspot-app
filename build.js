@@ -1,7 +1,6 @@
 import fs from "node:fs"
 import esbuild from "esbuild"
 import sveltePlugin from "esbuild-svelte"
-import sveltePreprocess from "svelte-preprocess"
 
 const isDev = process.env.NODE_ENV === "development"
 
@@ -21,9 +20,7 @@ const config = {
   sourcemap: isDev,
   metafile: isDev,
   plugins: [
-    sveltePlugin({
-      preprocess: sveltePreprocess(),
-    }),
+    sveltePlugin(),
     {
       name: "on-end",
       setup(build) {

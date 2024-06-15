@@ -1,3 +1,5 @@
+import { mount } from "svelte"
+
 import App from "./app.svelte"
 
 import "purecss/build/base.css"
@@ -6,6 +8,6 @@ import "purecss/build/buttons.css"
 import "purecss/build/menus.css"
 import "purecss/build/grids.css"
 
-new App({
+mount(App, {
   target: document.body,
 })
