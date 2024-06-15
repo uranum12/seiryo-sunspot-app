@@ -5,25 +5,21 @@
 </script>
 
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
-
   import Container from "@/components/container.svelte"
 
-  export let files: string[]
-
-  const dispatch = createEventDispatcher<{ submit: FormInput }>()
-
-  let filename = ""
-
-  let submitDisabled: boolean
-  $: submitDisabled = filename.trim() === ""
-
-  const dispatchSubmit = () => {
-    dispatch("submit", { filename })
+  type Props = {
+    files: string[]
+    onSubmit: (input: FormInput) => void
   }
 
-  const onSubmit = () => {
-    dispatchSubmit()
+  let { files, onSubmit }: Props = $props()
+
+  let filename = $state<string>("")
+
+  const submitDisabled = $derived<boolean>(filename.trim() === "")
+
+  const submit = () => {
+    onSubmit({ filename })
   }
 </script>
 
@@ -35,7 +31,7 @@
         <option value={file}>{file.replace(/^out\//, "")}</option>
       {/each}
     </select>
-    <button class="pure-button" disabled={submitDisabled} on:click={onSubmit}>
+    <button class="pure-button" disabled={submitDisabled} onclick={submit}>
       preview
     </button>
   </div>

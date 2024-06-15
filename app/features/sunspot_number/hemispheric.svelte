@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-
   import Alert from "@/components/alert.svelte"
   import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
@@ -14,11 +12,11 @@
     type FormInput as SaveFormInput,
   } from "./components/save_form.svelte"
 
-  let filename = ""
+  let filename = $state<string>("")
 
-  let filesPromise: ReturnType<typeof getFilesDraw>
-  let previewPromise: ReturnType<typeof getDraw> | undefined
-  let savePromise: ReturnType<typeof postDraw> | undefined
+  let filesPromise = $state<ReturnType<typeof getFilesDraw>>(getFilesDraw())
+  let previewPromise = $state<ReturnType<typeof getDraw> | undefined>(undefined)
+  let savePromise = $state<ReturnType<typeof postDraw> | undefined>(undefined)
 
   const fetchFiles = () => {
     previewPromise = undefined
@@ -26,21 +24,19 @@
     filesPromise = getFilesDraw()
   }
 
-  const fetchPreview = (e: CustomEvent<PreviewFormInput>) => {
+  const fetchPreview = (input: PreviewFormInput) => {
     savePromise = undefined
-    filename = e.detail.filename
-    previewPromise = getDraw(e.detail)
+    filename = input.filename
+    previewPromise = getDraw(input)
   }
 
-  const submitSave = (e: CustomEvent<SaveFormInput>) => {
-    savePromise = postDraw({ input: filename, ...e.detail })
+  const submitSave = (input: SaveFormInput) => {
+    savePromise = postDraw({ input: filename, ...input })
   }
-
-  onMount(fetchFiles)
 </script>
 
 <Container>
-  <button class="pure-button" on:click={fetchFiles}>refresh files</button>
+  <button class="pure-button" onclick={fetchFiles}>refresh files</button>
 </Container>
 
 {#if filesPromise}
@@ -48,7 +44,7 @@
     <p>loading...</p>
   {:then files}
     {#if files.length !== 0}
-      <PreviewForm {files} on:submit={fetchPreview} />
+      <PreviewForm {files} onSubmit={fetchPreview} />
     {:else}
       <Container>
         <Alert type="warning">
@@ -76,7 +72,7 @@
         alt="sunspot number hemispheric"
       />
     </Container>
-    <SaveForm {filename} on:submit={submitSave} />
+    <SaveForm {filename} onSubmit={submitSave} />
   {:catch e}
     <Container>
       <Alert type="error">
