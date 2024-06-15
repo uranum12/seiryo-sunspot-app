@@ -58,6 +58,6 @@
   </div>
 </Container>
 
-<ConfirmDialog bind:isOpen={showConfirmOverwrite} on:ok={confirmOverwrite}>
+<ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={confirmOverwrite}>
   Are you sure you want me to overwrite file {filename}.parquet ?
 </ConfirmDialog>

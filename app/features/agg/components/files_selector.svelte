@@ -37,7 +37,9 @@
 </script>
 
 <Accordion>
-  <span slot="summary">filter</span>
+  {#snippet summary()}
+    <span>filter</span>
+  {/snippet}
   <input class="pure-input-1 filter-input" bind:value={filter} />
   <button class="pure-button" on:click={filterApply}>apply</button>
   <button class="pure-button" on:click={filterClear}>clear</button>

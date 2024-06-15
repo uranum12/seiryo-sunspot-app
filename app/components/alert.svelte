@@ -1,9 +1,16 @@
 <script lang="ts">
-  export let severity: "success" | "warning" | "error"
+  import type { Snippet } from "svelte"
+
+  type Props = {
+    severity: "success" | "warning" | "error"
+    children: Snippet
+  }
+
+  let { severity, children }: Props = $props()
 </script>
 
 <div class="alert {severity}">
-  <slot />
+  {@render children()}
 </div>
 
 <style>

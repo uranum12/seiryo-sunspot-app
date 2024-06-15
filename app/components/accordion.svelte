@@ -1,9 +1,20 @@
+<script lang="ts">
+  import type { Snippet } from "svelte"
+
+  type Props = {
+    summary: Snippet
+    children: Snippet
+  }
+
+  let { summary, children }: Props = $props()
+</script>
+
 <details>
   <summary>
-    <slot name="summary" />
+    {@render summary()}
   </summary>
   <div>
-    <slot />
+    {@render children()}
   </div>
 </details>
 

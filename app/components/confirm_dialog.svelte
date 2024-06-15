@@ -1,38 +1,49 @@
 <script lang="ts">
-  import { createEventDispatcher } from "svelte"
+  import type { Snippet } from "svelte"
 
-  export let isOpen = false
+  type Props = {
+    onConfirm?: () => void
+    onCancel?: () => void
+    children: Snippet
+    isOpen: boolean
+  }
+
+  let { onConfirm, onCancel, children, isOpen = $bindable() }: Props = $props()
 
   let dialog: HTMLDialogElement
 
-  $: if (dialog) {
-    if (isOpen) {
-      dialog.showModal()
-    } else {
-      dialog.close()
+  $effect(() => {
+    if (dialog) {
+      if (isOpen) {
+        dialog.showModal()
+      } else {
+        dialog.close()
+      }
+    }
+  })
+
+  const handleConfirm = () => {
+    isOpen = false
+    if (onConfirm) {
+      onConfirm()
     }
   }
 
-  const dispatch = createEventDispatcher()
-
-  const handleOk = () => {
-    dispatch("ok")
-    isOpen = false
-  }
-
   const handleCancel = () => {
-    dispatch("cancel")
     isOpen = false
+    if (onCancel) {
+      onCancel()
+    }
   }
 </script>
 
 <dialog class="dialog" bind:this={dialog}>
   <p>
-    <slot />
+    {@render children()}
   </p>
   <p>
-    <button class="pure-button" on:click={handleOk}>ok</button>
-    <button class="pure-button" on:click={handleCancel}>cancel</button>
+    <button class="pure-button" onclick={handleConfirm}>ok</button>
+    <button class="pure-button" onclick={handleCancel}>cancel</button>
   </p>
 </dialog>
 
