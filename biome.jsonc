@@ -16,7 +16,7 @@
   "linter": { "enabled": true, "rules": { "all": true } },
   "organizeImports": { "enabled": true },
   "javascript": {
-    "globals": ["$props", "$bindable", "$effect", "$state"],
+    "globals": ["$props", "$bindable", "$effect", "$state", "$derived"],
     "formatter": {
       "semicolons": "asNeeded"
     }

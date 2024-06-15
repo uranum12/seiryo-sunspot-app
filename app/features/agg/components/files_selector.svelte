@@ -1,21 +1,33 @@
 <script lang="ts">
+  import { untrack } from "svelte"
+
   import Accordion from "@/components/accordion.svelte"
   import Alert from "@/components/alert.svelte"
 
-  export let files: string[]
-  export let selected: string[]
+  type Props = {
+    files: string[]
+    selected: string[]
+  }
 
-  let filtered: string[] = files.sort()
-  let checked: string[] = []
-  let filter = ""
+  let { files, selected = $bindable() }: Props = $props()
+
+  let filtered = $state<string[]>(files.sort())
+  let checked = $state<string[]>([])
+  let filter = $state<string>("")
+
+  const hidden = $derived(files.filter((file) => !filtered.includes(file)))
+
+  $effect(() => {
+    selected = untrack<string[]>(() => selected)
+      .filter((file) => hidden.includes(file))
+      .concat(checked)
+  })
 
   const filterApply = () => {
     filtered = files.filter((file) =>
       file.replace(/^data\//, "").includes(filter)
     )
-    checked = selected.filter((file) =>
-      file.replace(/^data\//, "").includes(filter)
-    )
+    checked = selected.filter((file) => filtered.includes(file))
   }
 
   const filterClear = () => {
@@ -24,16 +36,12 @@
   }
 
   const selectAll = () => {
-    checked = Array.from(new Set([...checked, ...filtered]))
+    checked = filtered
   }
 
   const deselectAll = () => {
-    checked = checked.filter((file) => !filtered.includes(file))
+    checked = []
   }
-
-  $: selected = checked.concat(
-    selected.filter((file) => !filtered.includes(file))
-  )
 </script>
 
 <Accordion>
@@ -41,8 +49,8 @@
     <span>filter</span>
   {/snippet}
   <input class="pure-input-1 filter-input" bind:value={filter} />
-  <button class="pure-button" on:click={filterApply}>apply</button>
-  <button class="pure-button" on:click={filterClear}>clear</button>
+  <button class="pure-button" onclick={filterApply}>apply</button>
+  <button class="pure-button" onclick={filterClear}>clear</button>
 </Accordion>
 
 {#if filtered.length === 0}
@@ -51,9 +59,8 @@
   </Alert>
 {:else}
   <div>
-    <button class="pure-button" on:click={selectAll}>select all files</button>
-    <button class="pure-button" on:click={deselectAll}
-      >deselect all files</button
+    <button class="pure-button" onclick={selectAll}>select all files</button>
+    <button class="pure-button" onclick={deselectAll}>deselect all files</button
     >
   </div>
 
