@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte"
-
   import Alert from "@/components/alert.svelte"
   import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
@@ -9,46 +7,42 @@
   import { getFilesAgg } from "./api/files"
   import FileForm, { type FormInput } from "./components/file_form.svelte"
 
-  let filesPromise: ReturnType<typeof getFilesAgg>
-  let aggPromise: ReturnType<typeof postAgg> | undefined
+  let filesPromise = $state<ReturnType<typeof getFilesAgg>>(getFilesAgg())
+  let aggPromise = $state<ReturnType<typeof postAgg> | undefined>(undefined)
 
   const fetchFiles = () => {
     aggPromise = undefined
     filesPromise = getFilesAgg()
   }
 
-  const submitAgg = (e: CustomEvent<FormInput>) => {
-    aggPromise = postAgg(e.detail)
+  const submitAgg = (input: FormInput) => {
+    aggPromise = postAgg(input)
   }
-
-  onMount(fetchFiles)
 </script>
 
 <Container>
-  <button class="pure-button" on:click={fetchFiles}>refresh files</button>
+  <button class="pure-button" onclick={fetchFiles}>refresh files</button>
 </Container>
 
-{#if filesPromise}
-  {#await filesPromise}
-    <p>loading...</p>
-  {:then files}
-    {#if files.length !== 0}
-      <FileForm {files} on:submit={submitAgg} />
-    {:else}
-      <Container>
-        <Alert type="warning">
-          <p>no files</p>
-        </Alert>
-      </Container>
-    {/if}
-  {:catch e}
+{#await filesPromise}
+  <p>loading...</p>
+{:then files}
+  {#if files.length !== 0}
+    <FileForm {files} onSubmit={submitAgg} />
+  {:else}
     <Container>
-      <Alert type="error">
-        <p>{e.message}</p>
+      <Alert type="warning">
+        <p>no files</p>
       </Alert>
     </Container>
-  {/await}
-{/if}
+  {/if}
+{:catch e}
+  <Container>
+    <Alert type="error">
+      <p>{e.message}</p>
+    </Alert>
+  </Container>
+{/await}
 
 {#if aggPromise}
   {#await aggPromise}
