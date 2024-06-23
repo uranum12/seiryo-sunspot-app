@@ -3,6 +3,11 @@ from invoke.tasks import task
 
 
 @task
+def dev(c: Context) -> None:
+    c.run("uvicorn api.main:app --host 0.0.0.0 --reload", pty=True)
+
+
+@task
 def fmt(c: Context) -> None:
     c.run("ruff check --fix-only --show-fixes api", pty=True)
     c.run("ruff format tasks.py api", pty=True)

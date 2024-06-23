@@ -5,8 +5,8 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from libs import sunspot_number
-from libs.config_common import (
+from api.libs import sunspot_number
+from api.libs.config_common import (
     Axis,
     FigSize,
     Legend,
@@ -15,7 +15,7 @@ from libs.config_common import (
     Ticks,
     Title,
 )
-from libs.sunspot_number_config import (
+from api.libs.sunspot_number_config import (
     SunspotNumberHemispheric,
     SunspotNumberWholeDisk,
 )

@@ -1,4 +1,3 @@
-import json
 from typing import TYPE_CHECKING
 
 import matplotlib.dates as mdates
@@ -7,7 +6,7 @@ import polars as pl
 from dateutil.relativedelta import relativedelta
 from matplotlib.figure import Figure
 
-from libs.sunspot_number_config import (
+from api.libs.sunspot_number_config import (
     SunspotNumberHemispheric,
     SunspotNumberWholeDisk,
 )

@@ -4,7 +4,7 @@ import polars as pl
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from libs import agg
+from api.libs import agg
 
 
 class AggMain(BaseModel):

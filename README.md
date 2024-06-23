@@ -34,12 +34,13 @@ poetry install --sync
 ### run
 
 ```sh
-python api/main.py
+poetry run uvicorn api.main:app
 ```
 
 ### develop
 
 ```sh
+poetry run inv dev
 poetry run inv fmt
 poetry run inv lint
 poetry run inv test --cov

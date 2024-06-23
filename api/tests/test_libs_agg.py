@@ -5,7 +5,7 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from libs import agg
+from api.libs import agg
 
 
 @pytest.mark.parametrize(

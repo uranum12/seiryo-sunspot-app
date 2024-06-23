@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from libs.config_common import Axis, FigSize, Legend, Line, Title
+from api.libs.config_common import Axis, FigSize, Legend, Line, Title
 
 
 class SunspotNumberWholeDisk(BaseModel):

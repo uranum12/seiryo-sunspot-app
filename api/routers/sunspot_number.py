@@ -5,8 +5,8 @@ import polars as pl
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from libs import sunspot_number, utils
-from libs.sunspot_number_config import (
+from api.libs import sunspot_number, utils
+from api.libs.sunspot_number_config import (
     SunspotNumberHemispheric,
     SunspotNumberWholeDisk,
 )

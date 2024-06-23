@@ -22,7 +22,7 @@ pytest = "*"
 pytest-cov = "*"
 
 [tool.ruff]
-src = ["api"]
+src = ["."]
 target-version = "py310"
 line-length = 79
 output-format = "grouped"
