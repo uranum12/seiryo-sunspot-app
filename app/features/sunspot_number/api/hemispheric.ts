@@ -6,6 +6,7 @@ type GetDrawRes = {
 
 type GetDrawParams = {
   filename: string
+  configName: string
 }
 
 export async function getDraw(
@@ -25,6 +26,7 @@ type PostDrawRes = {
 type PostDrawBody = {
   input: string
   format: string
+  config: string
   dpi: number
   overwrite: boolean
 }

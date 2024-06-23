@@ -1,6 +1,19 @@
+import json
+from typing import TYPE_CHECKING
+
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import polars as pl
+from dateutil.relativedelta import relativedelta
 from matplotlib.figure import Figure
+
+from libs.sunspot_number_config import (
+    SunspotNumberHemispheric,
+    SunspotNumberWholeDisk,
+)
+
+if TYPE_CHECKING:
+    from datetime import date
 
 
 def split(df: pl.LazyFrame) -> tuple[pl.LazyFrame, pl.LazyFrame]:
@@ -94,15 +107,68 @@ def agg_monthly(df: pl.DataFrame) -> pl.DataFrame:
     )
 
 
-def draw_sunspot_number_whole_disk(df: pl.DataFrame) -> Figure:
-    fig = plt.figure(figsize=(8, 5))
+def draw_sunspot_number_whole_disk(
+    df: pl.DataFrame, config: SunspotNumberWholeDisk
+) -> Figure:
+    date_min: date = df.select(pl.min("date")).item()
+    date_max: date = df.select(pl.max("date")).item()
+    date_min = date_min.replace(month=1, day=1)
+    date_max = date_max.replace(month=1, day=1) + relativedelta(years=1)
+    date_num_min = float(mdates.date2num(date_min))
+    date_num_max = float(mdates.date2num(date_max))
+    date_margin = (date_num_max - date_num_min) * 0.05
+    total_max: float = df.select(pl.max("total")).item()
+    total_margin = total_max * 0.05
+
+    fig = plt.figure(figsize=(config.fig_size.width, config.fig_size.height))
     ax = fig.add_subplot(111)
 
-    ax.plot(df["date"], df["total"])
+    ax.plot(
+        df["date"],
+        df["total"],
+        ls=config.line.style,
+        lw=config.line.width,
+        c=config.line.color,
+        marker=config.line.marker.marker,
+        ms=config.line.marker.size,
+    )
 
-    ax.set_title("seiryo's whole-disk sunspot number")
-    ax.set_xlabel("date")
-    ax.set_ylabel("sunspot number")
+    ax.set_title(
+        config.title.text,
+        fontfamily=config.title.font_family,
+        fontsize=config.title.font_size,
+    )
+
+    ax.set_xlabel(
+        config.xaxis.title.text,
+        fontfamily=config.xaxis.title.font_family,
+        fontsize=config.xaxis.title.font_size,
+    )
+
+    ax.xaxis.set_major_locator(locator := mdates.AutoDateLocator())
+    ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+    ax.set_xticks(ax.get_xticks())
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontfamily=config.xaxis.ticks.font_family,
+        fontsize=config.xaxis.ticks.font_size,
+    )
+
+    ax.set_ylabel(
+        config.yaxis.title.text,
+        fontfamily=config.yaxis.title.font_family,
+        fontsize=config.yaxis.title.font_size,
+    )
+
+    ax.set_yticks(ax.get_yticks())
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        fontfamily=config.yaxis.ticks.font_family,
+        fontsize=config.yaxis.ticks.font_size,
+    )
+
+    ax.set_xlim(date_num_min - date_margin, date_num_max + date_margin)
+    ax.set_ylim(-total_margin, total_max + total_margin)
 
     ax.grid()
 
@@ -111,16 +177,82 @@ def draw_sunspot_number_whole_disk(df: pl.DataFrame) -> Figure:
     return fig
 
 
-def draw_sunspot_number_hemispheric(df: pl.DataFrame) -> Figure:
-    fig = plt.figure(figsize=(8, 5))
+def draw_sunspot_number_hemispheric(
+    df: pl.DataFrame, config: SunspotNumberHemispheric
+) -> Figure:
+    date_min: date = df.select(pl.min("date")).item()
+    date_max: date = df.select(pl.max("date")).item()
+    date_min = date_min.replace(month=1, day=1)
+    date_max = date_max.replace(month=1, day=1) + relativedelta(years=1)
+    date_num_min = float(mdates.date2num(date_min))
+    date_num_max = float(mdates.date2num(date_max))
+    date_margin = (date_num_max - date_num_min) * 0.05
+    north_max: float = df.select(pl.max("north")).item()
+    south_max: float = df.select(pl.max("south")).item()
+    sunspot_max = max(north_max, south_max)
+    sunspot_margin = sunspot_max * 0.05
+
+    fig = plt.figure(figsize=(config.fig_size.width, config.fig_size.height))
     ax = fig.add_subplot(111)
 
-    ax.plot(df["date"], df["north"], lw=1, label="north")
-    ax.plot(df["date"], df["south"], lw=1, label="south")
+    ax.plot(
+        df["date"],
+        df["north"],
+        ls=config.line_north.style,
+        lw=config.line_north.width,
+        c=config.line_north.color,
+        label=config.line_north.label,
+        marker=config.line_north.marker.marker,
+        ms=config.line_north.marker.size,
+    )
+    ax.plot(
+        df["date"],
+        df["south"],
+        ls=config.line_south.style,
+        lw=config.line_south.width,
+        c=config.line_south.color,
+        label=config.line_south.label,
+        marker=config.line_south.marker.marker,
+        ms=config.line_south.marker.size,
+    )
 
-    ax.set_title("seiryo's hemispheric sunspot number", y=1.1)
-    ax.set_xlabel("date")
-    ax.set_ylabel("sunspot number")
+    ax.set_title(
+        config.title.text,
+        fontfamily=config.title.font_family,
+        fontsize=config.title.font_size,
+        y=config.title.position,
+    )
+
+    ax.set_xlabel(
+        config.xaxis.title.text,
+        fontfamily=config.xaxis.title.font_family,
+        fontsize=config.xaxis.title.font_size,
+    )
+
+    ax.xaxis.set_major_locator(locator := mdates.AutoDateLocator())
+    ax.xaxis.set_major_formatter(mdates.ConciseDateFormatter(locator))
+    ax.set_xticks(ax.get_xticks())
+    ax.set_xticklabels(
+        ax.get_xticklabels(),
+        fontfamily=config.xaxis.ticks.font_family,
+        fontsize=config.xaxis.ticks.font_size,
+    )
+
+    ax.set_ylabel(
+        config.yaxis.title.text,
+        fontfamily=config.yaxis.title.font_family,
+        fontsize=config.yaxis.title.font_size,
+    )
+
+    ax.set_yticks(ax.get_yticks())
+    ax.set_yticklabels(
+        ax.get_yticklabels(),
+        fontfamily=config.yaxis.ticks.font_family,
+        fontsize=config.yaxis.ticks.font_size,
+    )
+
+    ax.set_xlim(date_num_min - date_margin, date_num_max + date_margin)
+    ax.set_ylim(-sunspot_margin, sunspot_max + sunspot_margin)
 
     ax.grid()
     ax.legend(
@@ -131,6 +263,10 @@ def draw_sunspot_number_hemispheric(df: pl.DataFrame) -> Figure:
         bbox_to_anchor=(0.5, 1.02),
         borderaxespad=0,
         ncol=2,
+        prop={
+            "family": config.legend.font_family,
+            "size": config.legend.font_size,
+        },
     )
 
     fig.tight_layout()
@@ -142,6 +278,7 @@ if __name__ == "__main__":
     from pathlib import Path
 
     input_file = Path("out/all.parquet")
+    config_path = Path("config/sunspot_number")
     output_dir = Path("out/sunspot")
     output_dir.mkdir(exist_ok=True, parents=True)
     df_spot, df_nospot = split(pl.scan_parquet(input_file))
@@ -156,7 +293,15 @@ if __name__ == "__main__":
     df_monthly = agg_monthly(df_raw)
     print(df_monthly)
     df_monthly.write_parquet(output_dir / "monthly.parquet")
-    fig_whole_disk = draw_sunspot_number_whole_disk(df_monthly)
+    with (config_path / "whole_disk/default.json").open("r") as file:
+        config_whole_disk = SunspotNumberWholeDisk(**json.load(file))
+    fig_whole_disk = draw_sunspot_number_whole_disk(
+        df_monthly, config_whole_disk
+    )
     fig_whole_disk.savefig(output_dir / "whole_disk.jpg")
-    fig_hemispheric = draw_sunspot_number_hemispheric(df_monthly)
+    with (config_path / "hemispheric/default.json").open("r") as file:
+        config_hemispheric = SunspotNumberHemispheric(**json.load(file))
+    fig_hemispheric = draw_sunspot_number_hemispheric(
+        df_monthly, config_hemispheric
+    )
     fig_hemispheric.savefig(output_dir / "hemispheric.jpg")

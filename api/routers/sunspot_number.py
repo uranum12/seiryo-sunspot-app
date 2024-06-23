@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import polars as pl
@@ -5,6 +6,10 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from libs import sunspot_number, utils
+from libs.sunspot_number_config import (
+    SunspotNumberHemispheric,
+    SunspotNumberWholeDisk,
+)
 
 
 class SunspotNumberAgg(BaseModel):
@@ -24,6 +29,7 @@ class SunspotNumberDrawPreviewRes(BaseModel):
 
 class SunspotNumberDrawSave(BaseModel):
     input: str
+    config: str
     format: str
     dpi: int = 300
     overwrite: bool = False
@@ -77,13 +83,27 @@ def sunspot_number_main(body: SunspotNumberAgg) -> SunspotNumberAggRes:
 
 @router.get("/draw/whole_disk", response_model=SunspotNumberDrawPreviewRes)
 def sunspot_number_draw_whole_disk(
-    filename: str,
+    filename: str, config_name: str
 ) -> SunspotNumberDrawPreviewRes:
-    path = Path(filename)
-    if not path.exists():
-        raise HTTPException(status_code=404, detail=f"file {path} not found")
-    df = pl.read_parquet(path)
-    fig = sunspot_number.draw_sunspot_number_whole_disk(df)
+    input_path = Path(filename)
+    if not input_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {input_path} not found"
+        )
+    config_path = Path(config_name)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
+    try:
+        with config_path.open("r") as f:
+            config = SunspotNumberWholeDisk(**json.load(f))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
+    df = pl.read_parquet(input_path)
+    fig = sunspot_number.draw_sunspot_number_whole_disk(df, config)
     img = utils.fig_to_base64(fig)
     return SunspotNumberDrawPreviewRes(img=img)
 
@@ -97,13 +117,25 @@ def sunspot_number_save_whole_disk(
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
+    config_path = Path(body.config)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
     output_path = input_path.with_name(f"whole_disk.{body.format}")
     if not body.overwrite and output_path.exists():
         raise HTTPException(
             status_code=400, detail=f"file {output_path} already exists"
         )
+    try:
+        with config_path.open("r") as f:
+            config = SunspotNumberWholeDisk(**json.load(f))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
     df = pl.read_parquet(input_path)
-    fig = sunspot_number.draw_sunspot_number_whole_disk(df)
+    fig = sunspot_number.draw_sunspot_number_whole_disk(df, config)
     fig.savefig(
         output_path,
         format=body.format,
@@ -116,13 +148,28 @@ def sunspot_number_save_whole_disk(
 
 @router.get("/draw/hemispheric", response_model=SunspotNumberDrawPreviewRes)
 def sunspot_number_draw_hemispheric(
-    filename: str,
+    filename: str, config_name: str
 ) -> SunspotNumberDrawPreviewRes:
-    path = Path(filename)
-    if not path.exists():
-        raise HTTPException(status_code=404, detail=f"file {path} not found")
-    df = pl.read_parquet(path)
-    fig = sunspot_number.draw_sunspot_number_hemispheric(df)
+    input_path = Path(filename)
+    if not input_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {input_path} not found"
+        )
+    config_path = Path(config_name)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
+    try:
+        with config_path.open("r") as f:
+            config = SunspotNumberHemispheric(**json.load(f))
+    except ValueError as e:
+        print(e)
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
+    df = pl.read_parquet(input_path)
+    fig = sunspot_number.draw_sunspot_number_hemispheric(df, config)
     img = utils.fig_to_base64(fig)
     return SunspotNumberDrawPreviewRes(img=img)
 
@@ -136,13 +183,25 @@ def sunspot_number_save_hemispheric(
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
+    config_path = Path(body.config)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
     output_path = input_path.with_name(f"hemispheric.{body.format}")
     if not body.overwrite and output_path.exists():
         raise HTTPException(
             status_code=400, detail=f"file {output_path} already exists"
         )
+    try:
+        with config_path.open("r") as f:
+            config = SunspotNumberHemispheric(**json.load(f))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
     df = pl.read_parquet(input_path)
-    fig = sunspot_number.draw_sunspot_number_hemispheric(df)
+    fig = sunspot_number.draw_sunspot_number_hemispheric(df, config)
     fig.savefig(
         output_path,
         format=body.format,

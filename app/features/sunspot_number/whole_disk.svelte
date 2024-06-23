@@ -3,7 +3,10 @@
   import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
 
-  import { getFilesDraw } from "./api/files"
+  import {
+    getFilesConfigWholeDisk as getConfigs,
+    getFilesDraw,
+  } from "./api/files"
   import { getDraw, postDraw } from "./api/whole_disk"
   import PreviewForm, {
     type FormInput as PreviewFormInput,
@@ -12,9 +15,13 @@
     type FormInput as SaveFormInput,
   } from "./components/save_form.svelte"
 
+  const defaultConfig = "config/sunspot_number/whole_disk.json"
+
   let filename = $state<string>("")
+  let config = $state<string>("")
 
   let filesPromise = $state<ReturnType<typeof getFilesDraw>>(getFilesDraw())
+  let configsPromise = $state<ReturnType<typeof getConfigs>>(getConfigs())
   let previewPromise = $state<ReturnType<typeof getDraw> | undefined>(undefined)
   let savePromise = $state<ReturnType<typeof postDraw> | undefined>(undefined)
 
@@ -22,16 +29,18 @@
     previewPromise = undefined
     savePromise = undefined
     filesPromise = getFilesDraw()
+    configsPromise = getConfigs()
   }
 
   const fetchPreview = (input: PreviewFormInput) => {
     savePromise = undefined
     filename = input.filename
+    config = input.configName
     previewPromise = getDraw(input)
   }
 
   const submitSave = (input: SaveFormInput) => {
-    savePromise = postDraw({ input: filename, ...input })
+    savePromise = postDraw({ input: filename, config, ...input })
   }
 </script>
 
@@ -39,11 +48,12 @@
   <button class="pure-button" onclick={fetchFiles}>refresh files</button>
 </Container>
 
-{#await filesPromise}
+{#await Promise.all([filesPromise, configsPromise])}
   <p>loading...</p>
-{:then files}
+{:then result}
+  {@const [files, configs] = result}
   {#if files.length !== 0}
-    <PreviewForm {files} onSubmit={fetchPreview} />
+    <PreviewForm {files} {configs} {defaultConfig} onSubmit={fetchPreview} />
   {:else}
     <Container>
       <Alert type="warning">
