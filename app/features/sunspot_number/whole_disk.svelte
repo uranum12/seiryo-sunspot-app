@@ -22,8 +22,8 @@
 
   let filesPromise = $state<ReturnType<typeof getFilesDraw>>(getFilesDraw())
   let configsPromise = $state<ReturnType<typeof getConfigs>>(getConfigs())
-  let previewPromise = $state<ReturnType<typeof getDraw> | undefined>(undefined)
-  let savePromise = $state<ReturnType<typeof postDraw> | undefined>(undefined)
+  let previewPromise = $state<ReturnType<typeof getDraw>>()
+  let savePromise = $state<ReturnType<typeof postDraw>>()
 
   const fetchFiles = () => {
     previewPromise = undefined
