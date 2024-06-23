@@ -272,36 +272,3 @@ def draw_sunspot_number_hemispheric(
     fig.tight_layout()
 
     return fig
-
-
-if __name__ == "__main__":
-    from pathlib import Path
-
-    input_file = Path("out/all.parquet")
-    config_path = Path("config/sunspot_number")
-    output_dir = Path("out/sunspot")
-    output_dir.mkdir(exist_ok=True, parents=True)
-    df_spot, df_nospot = split(pl.scan_parquet(input_file))
-    df_spot = df_spot.pipe(calc_lat).pipe(calc_sn)
-    df_nospot = df_nospot.select("date").pipe(fill_sn)
-    df_raw = pl.concat([df_spot, df_nospot]).pipe(sort).collect()
-    print(df_raw)
-    df_raw.write_parquet(output_dir / "raw.parquet")
-    df_daily = agg_daily(df_raw)
-    print(df_daily)
-    df_daily.write_parquet(output_dir / "daily.parquet")
-    df_monthly = agg_monthly(df_raw)
-    print(df_monthly)
-    df_monthly.write_parquet(output_dir / "monthly.parquet")
-    with (config_path / "whole_disk/default.json").open("r") as file:
-        config_whole_disk = SunspotNumberWholeDisk(**json.load(file))
-    fig_whole_disk = draw_sunspot_number_whole_disk(
-        df_monthly, config_whole_disk
-    )
-    fig_whole_disk.savefig(output_dir / "whole_disk.jpg")
-    with (config_path / "hemispheric/default.json").open("r") as file:
-        config_hemispheric = SunspotNumberHemispheric(**json.load(file))
-    fig_hemispheric = draw_sunspot_number_hemispheric(
-        df_monthly, config_hemispheric
-    )
-    fig_hemispheric.savefig(output_dir / "hemispheric.jpg")

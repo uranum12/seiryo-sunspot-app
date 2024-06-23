@@ -87,24 +87,3 @@ def sort(df: pl.LazyFrame) -> pl.LazyFrame:
     return df.select(
         ["date", "no", "lat_min", "lat_max", "lon_min", "lon_max", "num"]
     ).sort("date", "no")
-
-
-if __name__ == "__main__":
-    from pathlib import Path
-
-    output_dir = Path("out")
-    output_dir.mkdir(exist_ok=True)
-    output_path = output_dir / "all.parquet"
-    files = list(Path("data").glob("*.csv"))
-    df = (
-        pl.scan_csv(files, infer_schema_length=0)
-        .pipe(fill_date)
-        .pipe(convert_number)
-        .pipe(convert_date)
-        .pipe(convert_coord, col="lat", dtype=pl.Int8)
-        .pipe(convert_coord, col="lon", dtype=pl.Int16)
-        .pipe(sort)
-        .collect()
-    )
-    print(df)
-    df.write_parquet(output_path)
