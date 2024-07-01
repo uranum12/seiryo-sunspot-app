@@ -1,5 +1,8 @@
 <script lang="ts">
   import Agg from "@/features/agg/agg.svelte"
+  import ObservationsAgg from "@/features/observations/agg.svelte"
+  import ObservationsCalendar from "@/features/observations/calendar.svelte"
+  import ObservationsMonthly from "@/features/observations/monthly.svelte"
   import SunspotNumberAgg from "@/features/sunspot_number/agg.svelte"
   import SunspotNumberHemispheric from "@/features/sunspot_number/hemispheric.svelte"
   import SunspotNumberWholeDisk from "@/features/sunspot_number/whole_disk.svelte"
@@ -40,6 +43,12 @@
     <SunspotNumberWholeDisk />
   {:else if page === "sunspot_number/hemispheric"}
     <SunspotNumberHemispheric />
+  {:else if page === "observations/agg"}
+    <ObservationsAgg />
+  {:else if page === "observations/monthly"}
+    <ObservationsMonthly />
+  {:else if page === "observations/calendar"}
+    <ObservationsCalendar />
   {:else}
     <div class="container">
       <h2>Error: Not Found!</h2>

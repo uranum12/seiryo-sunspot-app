@@ -1,0 +1,28 @@
+{
+  "fig_size": { "width": 8.0, "height": 5.0 },
+  "bar": { "label": "", "width": 15.0, "color": "C0" },
+  "title": {
+    "text": "observations days per month",
+    "font_family": "Times New Roman",
+    "font_size": 16,
+    "position": 1.0
+  },
+  "xaxis": {
+    "title": {
+      "text": "date",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  },
+  "yaxis": {
+    "title": {
+      "text": "observations days",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  }
+}

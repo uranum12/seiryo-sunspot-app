@@ -10,6 +10,7 @@ pydantic = "^2.7.1"
 polars = "^0.20.30"
 matplotlib = "^3.9.0"
 python-dateutil = "^2.9.0"
+more-itertools = "^10.3.0"
 
 [tool.poetry.group.dev.dependencies]
 invoke = "*"
