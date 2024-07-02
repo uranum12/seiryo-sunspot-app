@@ -4,9 +4,9 @@ import polars as pl
 import pytest
 from polars.testing import assert_frame_equal
 
-from api.libs import obs_days
+from api.libs import observations
 from api.libs.config_common import Axis, Bar, FigSize, Ticks, Title
-from api.libs.obs_days_config import ObservationsMonthly
+from api.libs.observations_config import ObservationsMonthly
 
 
 @pytest.mark.parametrize(
@@ -41,7 +41,7 @@ def test_calc_date_range(
     in_date: list[date], out_start: date, out_end: date
 ) -> None:
     df = pl.LazyFrame({"date": in_date}, schema={"date": pl.Date})
-    start, end = obs_days.calc_date_range(df)
+    start, end = observations.calc_date_range(df)
     assert start == out_start
     assert end == out_end
 
@@ -72,7 +72,7 @@ def test_calc_date_range(
 def test_adjust_dates(
     in_start: date, in_end: date, out_start: date, out_end: date
 ) -> None:
-    start, end = obs_days.adjust_dates(in_start, in_end)
+    start, end = observations.adjust_dates(in_start, in_end)
     assert start == out_start
     assert end == out_end
 
@@ -175,7 +175,7 @@ def test_calc_dayly_obs(
         {"date": out_date, "obs": out_obs},
         schema={"date": pl.Date, "obs": pl.UInt8},
     )
-    df_out = obs_days.calc_dayly_obs(df_in, in_start, in_end)
+    df_out = observations.calc_dayly_obs(df_in, in_start, in_end)
     assert_frame_equal(df_out, df_expected)
 
 
@@ -234,7 +234,7 @@ def test_calc_monthly_obs(
         {"date": out_date, "obs": out_obs},
         schema={"date": pl.Date, "obs": pl.UInt8},
     )
-    df_out = obs_days.calc_monthly_obs(df_in)
+    df_out = observations.calc_monthly_obs(df_in)
     assert_frame_equal(df_out, df_expected)
 
 
@@ -274,4 +274,4 @@ def test_draw_monthly_obs_days() -> None:
             ticks=Ticks(font_family="Times New Roman", font_size=12),
         ),
     )
-    _ = obs_days.draw_monthly_obs_days(df, config)
+    _ = observations.draw_monthly_obs_days(df, config)
