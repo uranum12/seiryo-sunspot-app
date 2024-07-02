@@ -1,5 +1,7 @@
 <script lang="ts">
   import Agg from "@/features/agg/agg.svelte"
+  import ButterflyAgg from "@/features/butterfly/agg.svelte"
+  import ButterflyDraw from "@/features/butterfly/draw.svelte"
   import ObservationsAgg from "@/features/observations/agg.svelte"
   import ObservationsCalendar from "@/features/observations/calendar.svelte"
   import ObservationsMonthly from "@/features/observations/monthly.svelte"
@@ -49,6 +51,10 @@
     <ObservationsMonthly />
   {:else if page === "observations/calendar"}
     <ObservationsCalendar />
+  {:else if page === "butterfly/agg"}
+    <ButterflyAgg />
+  {:else if page === "butterfly/draw"}
+    <ButterflyDraw />
   {:else}
     <div class="container">
       <h2>Error: Not Found!</h2>

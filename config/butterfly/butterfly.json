@@ -1,0 +1,29 @@
+{
+  "fig_size": { "width": 8.0, "height": 5.0 },
+  "index": { "year_inteerval": 2, "lat_interval": 10 },
+  "image": { "cmap": "binary", "aspect": 1.0 },
+  "title": {
+    "text": "butterfly diagram",
+    "font_family": "Times New Roman",
+    "font_size": 16,
+    "position": 1.0
+  },
+  "xaxis": {
+    "title": {
+      "text": "date",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  },
+  "yaxis": {
+    "title": {
+      "text": "latitude",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  }
+}
