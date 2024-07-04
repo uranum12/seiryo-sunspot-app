@@ -1,6 +1,9 @@
 import fs from "node:fs"
 import esbuild from "esbuild"
 import sveltePlugin from "esbuild-svelte"
+import postCssPlugin from "esbuild-style-plugin"
+import autoprefixer from "autoprefixer"
+import tailwindcss from "tailwindcss"
 
 const isDev = process.env.NODE_ENV === "development"
 
@@ -23,6 +26,11 @@ const config = {
     sveltePlugin({
       compilerOptions: {
         runes: true,
+      },
+    }),
+    postCssPlugin({
+      postcss: {
+        plugins: [tailwindcss, autoprefixer],
       },
     }),
     {

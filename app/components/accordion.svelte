@@ -3,36 +3,20 @@
 
   type Props = {
     summary: string
+    class?: string
     children: Snippet
   }
 
-  let { summary, children }: Props = $props()
+  let { summary, class: className, children }: Props = $props()
 </script>
 
-<details>
-  <summary>
+<details class="{className} w-full border rounded border-gray-300 group">
+  <summary
+    class="p-2 border-gray-300 focus:outline-blue-500 group-open:border-b"
+  >
     {summary}
   </summary>
-  <div>
+  <div class="p-2">
     {@render children()}
   </div>
 </details>
-
-<style>
-  details {
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    width: 100%;
-    margin: 0.25rem 0;
-  }
-  summary {
-    padding: 0.5rem;
-  }
-  div {
-    padding: 0.5rem;
-  }
-  details[open] summary {
-    border-bottom: 1px solid #ccc;
-  }
-</style>

@@ -2,6 +2,7 @@
   import {
     addMonths,
     getDate,
+    getDay,
     getMonth,
     getYear,
     isSameMonth,
@@ -72,23 +73,23 @@
 </script>
 
 <Container>
-  <button class="pure-button" onclick={fetchFiles}>refresh files</button>
+  <button onclick={fetchFiles}>refresh files</button>
 </Container>
 
 {#await filesPromise}
   <p>loading...</p>
 {:then files}
   <Container>
-    <div class="pure-form pure-form-stacked">
-      <select class="pure-input-1" bind:value={filename}>
-        <option value="" selected disabled>select file</option>
-        {#each files.sort() as file}
-          <option value={file}>{file.replace(/^out\//, "")}</option>
-        {/each}
-      </select>
+    <select class="mb-1" bind:value={filename}>
+      <option value="" selected disabled>select file</option>
+      {#each files.sort() as file}
+        <option value={file}>{file.replace(/^out\//, "")}</option>
+      {/each}
+    </select>
+    <div class="mb-1 flex justify-between">
       <input
         type="number"
-        class="pure-input-1"
+        class="mr-1"
         placeholder="year"
         min="1000"
         max="3000"
@@ -96,20 +97,13 @@
       />
       <input
         type="number"
-        class="pure-input-1"
         placeholder="month"
         min="1"
         max="12"
         bind:value={month}
       />
-      <button
-        class="pure-button"
-        disabled={submitDisabled}
-        onclick={submitCalendar}
-      >
-        submit
-      </button>
     </div>
+    <button disabled={submitDisabled} onclick={submitCalendar}>submit</button>
   </Container>
 {:catch e}
   <Container>
@@ -124,31 +118,35 @@
     <p>loading...</p>
   {:then calendar}
     <Container>
-      <div class="calendar-nav">
-        <button class="pure-button" onclick={previousMonth}>
-          previous month
-        </button>
+      <div class="mb-1 flex justify-between">
+        <button onclick={previousMonth}>previous month</button>
         <div>{`${getYear(date)}-${getMonth(date) + 1}`}</div>
-        <button class="pure-button" onclick={nextMonth}>next month</button>
+        <button onclick={nextMonth}>next month</button>
       </div>
-      <table class="pure-table pure-table-bordered">
+      <table
+        class="w-full table-fixed break-words border rounded border-gray-300 border-separate border-spacing-0 overflow-hidden"
+      >
         <thead>
           <tr>
             {#each getWeek() as week}
-              <th>{week}</th>
+              <th class="p-2 border-r border-gray-300 last:border-r-0">
+                {week}
+              </th>
             {/each}
           </tr>
         </thead>
         <tbody>
           {#each calendar as week}
-            <tr>
+            <tr class="group">
               {#each week as day}
+                {@const weekday = getDay(day.date)}
                 <td
-                  class:not-observed={!day.obs}
-                  class:saturday={isSaturday(day.date)}
-                  class:sunday={isSunday(day.date)}
+                  class="p-2 border-r border-t border-gray-300 group-first:border-t-2 last:border-r-0 text-center"
+                  class:bg-gray-200={!day.obs}
+                  class:text-blue-500={weekday === 6}
+                  class:text-red-500={weekday === 0}
                 >
-                  <span class:out-of-month={!isSameMonth(day.date, date)}>
+                  <span class:opacity-40={!isSameMonth(day.date, date)}>
                     {getDate(day.date)}
                   </span>
                 </td>
@@ -166,33 +164,3 @@
     </Container>
   {/await}
 {/if}
-
-<style>
-  table {
-    width: 100%;
-    table-layout: fixed;
-    overflow-wrap: break-word;
-  }
-
-  .calendar-nav {
-    margin-bottom: 4px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .not-observed {
-    background-color: lightgray;
-  }
-
-  .saturday {
-    color: blue;
-  }
-
-  .sunday {
-    color: red;
-  }
-
-  .out-of-month {
-    opacity: 0.4;
-  }
-</style>

@@ -28,21 +28,17 @@
 </script>
 
 <Container>
-  <div class="pure-form pure-form-stacked">
-    <select class="pure-input-1" bind:value={filename}>
-      <option value="" selected disabled>select file</option>
-      {#each files.sort() as file}
-        <option value={file}>{file.replace(/^out\//, "")}</option>
-      {/each}
-    </select>
-    <select class="pure-input-1" bind:value={configName}>
-      <option value={defaultConfig} selected>default</option>
-      {#each configs.sort() as config}
-        <option value={config}>{config.replace(/^config\//, "")}</option>
-      {/each}
-    </select>
-    <button class="pure-button" disabled={submitDisabled} onclick={submit}>
-      preview
-    </button>
-  </div>
+  <select class="mb-1" required bind:value={filename}>
+    <option value="" selected disabled>select file</option>
+    {#each files.sort() as file}
+      <option value={file}>{file.replace(/^out\//, "")}</option>
+    {/each}
+  </select>
+  <select class="mb-1" bind:value={configName}>
+    <option value={defaultConfig} selected>default</option>
+    {#each configs.sort() as config}
+      <option value={config}>{config.replace(/^config\//, "")}</option>
+    {/each}
+  </select>
+  <button disabled={submitDisabled} onclick={submit}>preview</button>
 </Container>

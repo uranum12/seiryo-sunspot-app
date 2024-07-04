@@ -21,7 +21,7 @@
 </script>
 
 <Container>
-  <button class="pure-button" onclick={fetchFiles}>refresh files</button>
+  <button onclick={fetchFiles}>refresh files</button>
 </Container>
 
 {#await filesPromise}

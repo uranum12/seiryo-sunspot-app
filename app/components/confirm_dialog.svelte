@@ -37,21 +37,12 @@
   }
 </script>
 
-<dialog class="dialog" bind:this={dialog}>
+<dialog class="border rounded border-yellow-400 px-4 py-3" bind:this={dialog}>
   <p>
     {@render children()}
   </p>
-  <p>
-    <button class="pure-button" onclick={handleConfirm}>ok</button>
-    <button class="pure-button" onclick={handleCancel}>cancel</button>
+  <p class="pt-2">
+    <button onclick={handleConfirm}>ok</button>
+    <button onclick={handleCancel}>cancel</button>
   </p>
 </dialog>
-
-<style>
-  .dialog {
-    border: 1px solid;
-    border-radius: 4px;
-    padding: 0 1rem;
-    border-color: orange;
-  }
-</style>

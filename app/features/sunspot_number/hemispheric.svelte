@@ -45,7 +45,7 @@
 </script>
 
 <Container>
-  <button class="pure-button" onclick={fetchFiles}>refresh files</button>
+  <button onclick={fetchFiles}>refresh files</button>
 </Container>
 
 {#await Promise.all([filesPromise, configsPromise])}
@@ -75,7 +75,6 @@
   {:then preview}
     <Container>
       <img
-        class="pure-img"
         src={`data:image/png;base64,${preview}`}
         alt="sunspot number hemispheric"
       />

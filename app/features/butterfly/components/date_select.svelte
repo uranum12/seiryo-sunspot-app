@@ -3,10 +3,15 @@
 
   type Props = {
     date: string | undefined
+    class?: string
     required?: boolean
   }
 
-  let { date = $bindable(), required = false }: Props = $props()
+  let {
+    date = $bindable(),
+    class: className,
+    required = false,
+  }: Props = $props()
 
   let year = $state<number>()
   let month = $state<number>()
@@ -30,7 +35,7 @@
   })
 </script>
 
-<div class="input-date">
+<div class="{className} flex justify-between">
   <input
     type="number"
     min="1000"
@@ -41,6 +46,7 @@
   />
   <input
     type="number"
+    class="mx-1"
     min="1"
     max="12"
     placeholder="month"
@@ -56,14 +62,3 @@
     bind:value={day}
   />
 </div>
-
-<style>
-  .input-date {
-    display: flex;
-    justify-content: space-between;
-
-    input {
-      width: 33%;
-    }
-  }
-</style>

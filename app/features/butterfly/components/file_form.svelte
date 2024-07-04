@@ -69,52 +69,44 @@
 </script>
 
 <Container>
-  <div class="pure-form pure-form-stacked">
-    <select class="pure-input-1" bind:value={inputName}>
-      <option value="" selected disabled>select file</option>
-      {#each files.sort() as file}
-        <option value={file}>{file.replace(/^out\//, "")}</option>
-      {/each}
-    </select>
+  <select class="mb-1" bind:value={inputName}>
+    <option value="" selected disabled>select file</option>
+    {#each files.sort() as file}
+      <option value={file}>{file.replace(/^out\//, "")}</option>
+    {/each}
+  </select>
+  <input
+    class="mb-1"
+    placeholder="output file name"
+    required
+    bind:value={outputName}
+  />
+  <Accordion class="mb-1" summary="advanced settings">
     <input
-      placeholder="output file name"
-      class="pure-input-1"
-      required
-      bind:value={outputName}
+      type="number"
+      class="mb-1"
+      placeholder="latitude min value"
+      min="-90"
+      max="90"
+      bind:value={latMin}
     />
-    <Accordion summary="advanced settings">
-      <input
-        type="number"
-        class="pure-input-1"
-        placeholder="latitude min value"
-        min="-90"
-        max="90"
-        bind:value={latMin}
-      />
-      <input
-        type="number"
-        class="pure-input-1"
-        placeholder="latitude max value"
-        min="-90"
-        max="90"
-        bind:value={latMax}
-      />
-      <DateSelect bind:date={dateStart} />
-      <DateSelect bind:date={dateEnd} />
-      <IntervalSelect bind:interval={dateInterval} />
-    </Accordion>
-    <label class="pure-checkbox pure-input-1">
-      <input type="checkbox" bind:checked={overwrite} />
-      <span>Overwrite</span>
-    </label>
-    <button
-      class="pure-button"
-      disabled={submitDisabled}
-      onclick={onClickSubmit}
-    >
-      submit
-    </button>
-  </div>
+    <input
+      type="number"
+      class="mb-1"
+      placeholder="latitude max value"
+      min="-90"
+      max="90"
+      bind:value={latMax}
+    />
+    <DateSelect class="mb-1" bind:date={dateStart} />
+    <DateSelect class="mb-1" bind:date={dateEnd} />
+    <IntervalSelect bind:interval={dateInterval} />
+  </Accordion>
+  <label class="mb-1">
+    <input type="checkbox" bind:checked={overwrite} />
+    <span>Overwrite</span>
+  </label>
+  <button disabled={submitDisabled} onclick={onClickSubmit}>submit</button>
 </Container>
 
 <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={confirmOverwrite}>

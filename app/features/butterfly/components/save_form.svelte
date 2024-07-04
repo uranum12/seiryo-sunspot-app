@@ -40,33 +40,20 @@
 </script>
 
 <Container>
-  <div class="pure-form pure-form-stacked">
-    <select class="pure-input-1" bind:value={format}>
-      <option value="" selected disabled>select file format</option>
-      {#each formatList as format}
-        <option value={format.format}>
-          {format.description} ({format.format})
-        </option>
-      {/each}
-    </select>
-    <input
-      type="number"
-      class="pure-input-1"
-      placeholder="dpi"
-      bind:value={dpi}
-    />
-    <label class="pure-checkbox pure-input-1">
-      <input type="checkbox" bind:checked={overwrite} />
-      <span>Overwrite</span>
-    </label>
-    <button
-      class="pure-button"
-      disabled={submitDisabled}
-      onclick={onClickSubmit}
-    >
-      submit
-    </button>
-  </div>
+  <select class="mb-1" required bind:value={format}>
+    <option value="" selected disabled>select file format</option>
+    {#each formatList as format}
+      <option value={format.format}>
+        {format.description} ({format.format})
+      </option>
+    {/each}
+  </select>
+  <input type="number" class="mb-1" placeholder="dpi" bind:value={dpi} />
+  <label class="mb-1">
+    <input type="checkbox" bind:checked={overwrite} />
+    <span>Overwrite</span>
+  </label>
+  <button disabled={submitDisabled} onclick={onClickSubmit}>submit</button>
 </Container>
 
 <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submit}>

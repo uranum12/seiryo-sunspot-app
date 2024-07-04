@@ -20,21 +20,33 @@
 
 <svelte:window on:hashchange={getPageName} />
 
-<header>
-  <div class="pure-menu pure-menu-horizontal">
-    <a href="/#" class="pure-menu-heading pure-menu-link">home</a>
-    <ul class="pure-menu-list">
-      <li class="pure-menu-item">
-        <a href="/#agg" class="pure-menu-link">agg</a>
-      </li>
-      <li class="pure-menu-item">
-        <a href="/docs" class="pure-menu-link">api docs</a>
-      </li>
-    </ul>
-  </div>
+<header class="mb-4 px-8">
+  <ul class="flex">
+    <li class="">
+      <a
+        href="/#"
+        class="block px-4 py-2 border-blue-300 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
+        >home</a
+      >
+    </li>
+    <li class="">
+      <a
+        href="/#agg"
+        class="block px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
+        >agg</a
+      >
+    </li>
+    <li class="">
+      <a
+        href="/docs"
+        class="block px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
+        >api docs</a
+      >
+    </li>
+  </ul>
 </header>
 
-<main>
+<main class="px-8">
   {#if page === ""}
     <h1>hello world!</h1>
   {:else if page === "agg"}
@@ -61,13 +73,3 @@
     </div>
   {/if}
 </main>
-
-<style>
-  header {
-    height: fit-content;
-  }
-  main {
-    padding-left: 2rem;
-    padding-right: 2rem;
-  }
-</style>

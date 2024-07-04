@@ -22,7 +22,7 @@
   })
 </script>
 
-<div class="input-date">
+<div class="flex justify-content">
   <input
     type="number"
     min="1"
@@ -32,6 +32,7 @@
   />
   <input
     type="number"
+    class="mx-1"
     min="1"
     placeholder="months"
     {required}
@@ -45,14 +46,3 @@
     bind:value={days}
   />
 </div>
-
-<style>
-  .input-date {
-    display: flex;
-    justify-content: space-between;
-
-    input {
-      width: 33%;
-    }
-  }
-</style>

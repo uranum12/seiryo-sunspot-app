@@ -8,13 +8,6 @@
   let { children }: Props = $props()
 </script>
 
-<div class="container">
+<div class="mx-auto my-4 max-w-5xl">
   {@render children()}
 </div>
-
-<style>
-  .container {
-    margin: 1rem auto;
-    max-width: 64rem;
-  }
-</style>

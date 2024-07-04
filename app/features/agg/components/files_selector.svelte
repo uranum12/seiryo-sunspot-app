@@ -44,10 +44,10 @@
   }
 </script>
 
-<Accordion summary="filter">
-  <input class="pure-input-1 filter-input" bind:value={filter} />
-  <button class="pure-button" onclick={filterApply}>apply</button>
-  <button class="pure-button" onclick={filterClear}>clear</button>
+<Accordion class="mb-1" summary="filter">
+  <input bind:value={filter} class="mb-1" />
+  <button onclick={filterApply}>apply</button>
+  <button onclick={filterClear}>clear</button>
 </Accordion>
 
 {#if filtered.length === 0}
@@ -55,36 +55,17 @@
     <p>no files matched</p>
   </Alert>
 {:else}
-  <div>
-    <button class="pure-button" onclick={selectAll}>select all files</button>
-    <button class="pure-button" onclick={deselectAll}>deselect all files</button
-    >
+  <div class="mb-1">
+    <button onclick={selectAll}>select all files</button>
+    <button onclick={deselectAll}>deselect all files</button>
   </div>
 
-  <div class="pure-u-1 scroll-box">
+  <div class="p-2 border rounded border-gray-300 overflow-y-auto max-h-96">
     {#each filtered as file}
       <label>
         <input type="checkbox" bind:group={checked} value={file} />
-        <span class="file-name">{file.replace(/^data\//, "")}</span>
+        <span class="ml-1">{file.replace(/^data\//, "")}</span>
       </label>
     {/each}
   </div>
 {/if}
-
-<style>
-  .filter-input {
-    margin-top: 0 !important;
-  }
-  .scroll-box {
-    box-sizing: border-box;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    padding: 0 1rem;
-    margin: 0.25rem 0;
-    max-height: 32rem;
-    overflow-y: auto;
-  }
-  .file-name {
-    margin: 0.5rem;
-  }
-</style>

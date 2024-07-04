@@ -47,26 +47,18 @@
 </script>
 
 <Container>
-  <div class="pure-form pure-form-stacked">
-    <FilesSelector {files} bind:selected />
-    <input
-      placeholder="output file name"
-      class="pure-input-1"
-      required
-      bind:value={filename}
-    />
-    <label class="pure-checkbox pure-u-1">
-      <input type="checkbox" bind:checked={overwrite} />
-      <span>Overwrite</span>
-    </label>
-    <button
-      class="pure-button"
-      disabled={submitDisabled}
-      onclick={onClickSubmit}
-    >
-      submit
-    </button>
-  </div>
+  <FilesSelector {files} bind:selected />
+  <input
+    class="my-1"
+    placeholder="output file name"
+    required
+    bind:value={filename}
+  />
+  <label class="mb-1">
+    <input type="checkbox" bind:checked={overwrite} />
+    <span>Overwrite</span>
+  </label>
+  <button disabled={submitDisabled} onclick={onClickSubmit}>submit</button>
 </Container>
 
 <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={confirmOverwrite}>
