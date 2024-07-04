@@ -6,8 +6,6 @@
 </script>
 
 <script lang="ts">
-  import Container from "@/components/container.svelte"
-
   type Props = {
     files: string[]
     configs: string[]
@@ -27,7 +25,7 @@
   }
 </script>
 
-<Container>
+<section>
   <select class="mb-1" required bind:value={filename}>
     <option value="" selected disabled>select file</option>
     {#each files.sort() as file}
@@ -41,4 +39,4 @@
     {/each}
   </select>
   <button disabled={submitDisabled} onclick={submit}>preview</button>
-</Container>
+</section>

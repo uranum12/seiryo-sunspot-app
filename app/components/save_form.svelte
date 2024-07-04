@@ -9,7 +9,6 @@
 <script lang="ts">
   import formatList from "@/constants/format_list.json"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
-  import Container from "@/components/container.svelte"
 
   type Props = {
     onSubmit: (input: FormInput) => void
@@ -38,7 +37,7 @@
   }
 </script>
 
-<Container>
+<section>
   <select class="mb-1" required bind:value={format}>
     <option value="" selected disabled>select file format</option>
     {#each formatList as format}
@@ -59,7 +58,7 @@
     <span>Overwrite</span>
   </label>
   <button disabled={submitDisabled} onclick={onClickSubmit}>submit</button>
-</Container>
+</section>
 
 <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submit}>
   Are you sure you want me to overwrite file ?

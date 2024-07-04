@@ -68,8 +68,8 @@
   {:else if page === "butterfly/draw"}
     <ButterflyDraw />
   {:else}
-    <div class="container">
+    <section>
       <h2>Error: Not Found!</h2>
-    </div>
+    </section>
   {/if}
 </main>

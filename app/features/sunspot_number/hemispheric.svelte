@@ -1,19 +1,18 @@
 <script lang="ts">
   import Alert from "@/components/alert.svelte"
-  import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
 
-  import {
-    getFilesConfigHemispheric as getConfigs,
-    getFilesDraw,
-  } from "./api/files"
-  import { getDraw, postDraw } from "./api/hemispheric"
   import PreviewForm, {
     type FormInput as PreviewFormInput,
   } from "@/components/preview_form.svelte"
   import SaveForm, {
     type FormInput as SaveFormInput,
   } from "@/components/save_form.svelte"
+  import {
+    getFilesConfigHemispheric as getConfigs,
+    getFilesDraw,
+  } from "./api/files"
+  import { getDraw, postDraw } from "./api/hemispheric"
 
   const defaultConfig = "config/sunspot_number/hemispheric.json"
 
@@ -44,9 +43,9 @@
   }
 </script>
 
-<Container>
+<section>
   <button onclick={fetchFiles}>refresh files</button>
-</Container>
+</section>
 
 {#await Promise.all([filesPromise, configsPromise])}
   <p>loading...</p>
@@ -55,37 +54,37 @@
   {#if files.length !== 0}
     <PreviewForm {files} {configs} {defaultConfig} onSubmit={fetchPreview} />
   {:else}
-    <Container>
+    <section>
       <Alert type="warning">
         <p>no files</p>
       </Alert>
-    </Container>
+    </section>
   {/if}
 {:catch e}
-  <Container>
+  <section>
     <Alert type="error">
       <p>{e.message}</p>
     </Alert>
-  </Container>
+  </section>
 {/await}
 
 {#if previewPromise}
   {#await previewPromise}
     <p>loading...</p>
   {:then preview}
-    <Container>
+    <section>
       <img
         src={`data:image/png;base64,${preview}`}
         alt="sunspot number hemispheric"
       />
-    </Container>
+    </section>
     <SaveForm onSubmit={submitSave} />
   {:catch e}
-    <Container>
+    <section>
       <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
-    </Container>
+    </section>
   {/await}
 {/if}
 
@@ -93,16 +92,16 @@
   {#await savePromise}
     <p>loading...</p>
   {:then output}
-    <Container>
+    <section>
       <Alert type="success">
         <p>file {output} generated</p>
       </Alert>
-    </Container>
+    </section>
   {:catch e}
-    <Container>
+    <section>
       <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
-    </Container>
+    </section>
   {/await}
 {/if}

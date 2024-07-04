@@ -13,7 +13,6 @@
 
 <script lang="ts">
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
-  import Container from "@/components/container.svelte"
   import Accordion from "@/components/accordion.svelte"
 
   import DateSelect from "./date_select.svelte"
@@ -68,7 +67,7 @@
   }
 </script>
 
-<Container>
+<section>
   <select class="mb-1" bind:value={inputName}>
     <option value="" selected disabled>select file</option>
     {#each files.sort() as file}
@@ -107,7 +106,7 @@
     <span>Overwrite</span>
   </label>
   <button disabled={submitDisabled} onclick={onClickSubmit}>submit</button>
-</Container>
+</section>
 
 <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={confirmOverwrite}>
   Are you sure you want me to overwrite file ?

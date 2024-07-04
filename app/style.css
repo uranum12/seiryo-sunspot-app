@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer components {
+  section {
+    @apply mx-auto my-4 max-w-5xl;
+  }
   button {
     @apply px-4 py-2 outline-none border rounded border-gray-400;
     @apply hover:bg-gray-100 focus:bg-gray-100 active:bg-gray-200;

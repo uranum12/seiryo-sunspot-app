@@ -13,7 +13,6 @@
   import { untrack } from "svelte"
 
   import Alert from "@/components/alert.svelte"
-  import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { getCalendar } from "./api/calendar"
@@ -72,14 +71,14 @@
   })
 </script>
 
-<Container>
+<section>
   <button onclick={fetchFiles}>refresh files</button>
-</Container>
+</section>
 
 {#await filesPromise}
   <p>loading...</p>
 {:then files}
-  <Container>
+  <section>
     <select class="mb-1" bind:value={filename}>
       <option value="" selected disabled>select file</option>
       {#each files.sort() as file}
@@ -104,20 +103,20 @@
       />
     </div>
     <button disabled={submitDisabled} onclick={submitCalendar}>submit</button>
-  </Container>
+  </section>
 {:catch e}
-  <Container>
+  <section>
     <Alert type="error">
       <p>{e.message}</p>
     </Alert>
-  </Container>
+  </section>
 {/await}
 
 {#if calendarPromise && date}
   {#await calendarPromise}
     <p>loading...</p>
   {:then calendar}
-    <Container>
+    <section>
       <div class="mb-1 flex justify-between">
         <button onclick={previousMonth}>previous month</button>
         <div>{`${getYear(date)}-${getMonth(date) + 1}`}</div>
@@ -155,12 +154,12 @@
           {/each}
         </tbody>
       </table>
-    </Container>
+    </section>
   {:catch e}
-    <Container>
+    <section>
       <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
-    </Container>
+    </section>
   {/await}
 {/if}

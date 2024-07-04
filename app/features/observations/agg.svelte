@@ -1,6 +1,5 @@
 <script lang="ts">
   import Alert from "@/components/alert.svelte"
-  import Container from "@/components/container.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
@@ -20,9 +19,9 @@
   }
 </script>
 
-<Container>
+<section>
   <button onclick={fetchFiles}>refresh files</button>
-</Container>
+</section>
 
 {#await filesPromise}
   <p>loading...</p>
@@ -30,35 +29,35 @@
   {#if files.length !== 0}
     <FileForm {files} onSubmit={submitAgg} />
   {:else}
-    <Container>
+    <section>
       <Alert type="warning">
         <p>no files</p>
       </Alert>
-    </Container>
+    </section>
   {/if}
 {:catch e}
-  <Container>
+  <section>
     <Alert type="error">
       <p>{e.message}</p>
     </Alert>
-  </Container>
+  </section>
 {/await}
 
 {#if aggPromise}
   {#await aggPromise}
     <p>loading...</p>
   {:then output}
-    <Container>
+    <section>
       <Alert type="success">
         <p>file {output.outputDaily} generated</p>
         <p>file {output.outputMonthly} generated</p>
       </Alert>
-    </Container>
+    </section>
   {:catch e}
-    <Container>
+    <section>
       <Alert type="error">
         <p>{e instanceof FetchError ? e.detail : e.message}</p>
       </Alert>
-    </Container>
+    </section>
   {/await}
 {/if}

@@ -7,7 +7,6 @@
 
 <script lang="ts">
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
-  import Container from "@/components/container.svelte"
 
   type Props = {
     files: string[]
@@ -40,7 +39,7 @@
   }
 </script>
 
-<Container>
+<section>
   <select required bind:value={filename}>
     <option value="" selected disabled>select file</option>
     {#each files.sort() as file}
@@ -52,7 +51,7 @@
     <span>Overwrite</span>
   </label>
   <button disabled={submitDisabled} onclick={onClickSubmit}>submit</button>
-</Container>
+</section>
 
 <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={confirmOverwrite}>
   Are you sure you want me to overwrite file {filename}.parquet ?
