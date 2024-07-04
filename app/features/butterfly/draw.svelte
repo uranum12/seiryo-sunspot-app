@@ -7,10 +7,10 @@
   import { getFilesConfig, getFilesDraw } from "./api/files"
   import PreviewForm, {
     type FormInput as PreviewFormInput,
-  } from "./components/preview_form.svelte"
+  } from "@/components/preview_form.svelte"
   import SaveForm, {
     type FormInput as SaveFormInput,
-  } from "./components/save_form.svelte"
+  } from "@/components/save_form.svelte"
 
   const defaultConfig = "config/butterfly/butterfly.json"
 
@@ -74,7 +74,7 @@
     <Container>
       <img src={`data:image/png;base64,${preview}`} alt="butterfly diagram" />
     </Container>
-    <SaveForm {filename} onSubmit={submitSave} />
+    <SaveForm onSubmit={submitSave} />
   {:catch e}
     <Container>
       <Alert type="error">

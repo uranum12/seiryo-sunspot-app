@@ -10,10 +10,10 @@
   import { getDraw, postDraw } from "./api/hemispheric"
   import PreviewForm, {
     type FormInput as PreviewFormInput,
-  } from "./components/preview_form.svelte"
+  } from "@/components/preview_form.svelte"
   import SaveForm, {
     type FormInput as SaveFormInput,
-  } from "./components/save_form.svelte"
+  } from "@/components/save_form.svelte"
 
   const defaultConfig = "config/sunspot_number/hemispheric.json"
 
@@ -79,7 +79,7 @@
         alt="sunspot number hemispheric"
       />
     </Container>
-    <SaveForm {filename} onSubmit={submitSave} />
+    <SaveForm onSubmit={submitSave} />
   {:catch e}
     <Container>
       <Alert type="error">
