@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Component } from "svelte"
+
   import Agg from "@/features/agg/agg.svelte"
   import ButterflyAgg from "@/features/butterfly/agg.svelte"
   import ButterflyDraw from "@/features/butterfly/draw.svelte"
@@ -9,13 +11,75 @@
   import SunspotNumberHemispheric from "@/features/sunspot_number/hemispheric.svelte"
   import SunspotNumberWholeDisk from "@/features/sunspot_number/whole_disk.svelte"
 
-  let page = $state<string>("")
+  let currentPath = $state<string[]>([""])
 
   const getPageName = () => {
-    page = location.hash.replace("#", "")
+    currentPath = location.hash.replace("#/", "").split("/")
   }
 
   $effect(getPageName)
+
+  type Page = {
+    path: string
+    page?: Component
+    children?: Page[]
+  }
+
+  const searchPage = (path: string[], pages: Page[]): Component | undefined => {
+    if (path.length < 1) {
+      return undefined
+    }
+    for (let page of pages) {
+      if (page.path === path[0]) {
+        if (path.length === 1) {
+          return page.page
+        }
+        return page.children && searchPage(path.slice(1), page.children)
+      }
+    }
+    return undefined
+  }
+
+  const pages: Page[] = [
+    { path: "", page: Agg },
+    { path: "agg", page: Agg },
+    {
+      path: "sunspot_number",
+
+      children: [
+        { path: "agg", page: SunspotNumberAgg },
+        {
+          path: "whole_disk",
+
+          page: SunspotNumberWholeDisk,
+        },
+        {
+          path: "hemispheric",
+
+          page: SunspotNumberHemispheric,
+        },
+      ],
+    },
+    {
+      path: "observations",
+
+      children: [
+        { path: "agg", page: ObservationsAgg },
+        { path: "monthly", page: ObservationsMonthly },
+        { path: "calendar", page: ObservationsCalendar },
+      ],
+    },
+    {
+      path: "butterfly",
+
+      children: [
+        { path: "agg", page: ButterflyAgg },
+        { path: "draw", page: ButterflyDraw },
+      ],
+    },
+  ]
+
+  const page = $derived(searchPage(currentPath, pages))
 </script>
 
 <svelte:window on:hashchange={getPageName} />
@@ -47,26 +111,8 @@
 </header>
 
 <main class="px-8">
-  {#if page === ""}
-    <h1>hello world!</h1>
-  {:else if page === "agg"}
-    <Agg />
-  {:else if page === "sunspot_number/agg"}
-    <SunspotNumberAgg />
-  {:else if page === "sunspot_number/whole_disk"}
-    <SunspotNumberWholeDisk />
-  {:else if page === "sunspot_number/hemispheric"}
-    <SunspotNumberHemispheric />
-  {:else if page === "observations/agg"}
-    <ObservationsAgg />
-  {:else if page === "observations/monthly"}
-    <ObservationsMonthly />
-  {:else if page === "observations/calendar"}
-    <ObservationsCalendar />
-  {:else if page === "butterfly/agg"}
-    <ButterflyAgg />
-  {:else if page === "butterfly/draw"}
-    <ButterflyDraw />
+  {#if page}
+    <svelte:component this={page} />
   {:else}
     <section>
       <h2>Error: Not Found!</h2>
