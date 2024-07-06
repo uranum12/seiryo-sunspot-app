@@ -3,11 +3,12 @@ from datetime import date
 from pathlib import Path
 
 import polars as pl
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from api.libs import observations, observations_calendar, utils
 from api.libs.observations_config import ObservationsMonthly
+from api.models import draw
 
 
 class ObservationsAgg(BaseModel):
@@ -18,22 +19,6 @@ class ObservationsAgg(BaseModel):
 class ObservationsAggRes(BaseModel):
     output_daily: str
     output_monthly: str
-
-
-class ObservationsDrawPreviewRes(BaseModel):
-    img: str
-
-
-class ObservationsDrawSave(BaseModel):
-    input: str
-    config: str
-    format: str
-    dpi: int = 300
-    overwrite: bool = False
-
-
-class ObservationsDrawSaveRes(BaseModel):
-    output: str
 
 
 class ObsDay(BaseModel):
@@ -78,16 +63,16 @@ def observations_agg(body: ObservationsAgg) -> ObservationsAggRes:
     )
 
 
-@router.get("/draw/monthly", response_model=ObservationsDrawPreviewRes)
+@router.get("/draw/monthly", response_model=draw.PreviewRes)
 def observations_draw_monthly_preview(
-    filename: str, config_name: str
-) -> ObservationsDrawPreviewRes:
-    input_path = Path(filename)
+    query: draw.PreviewQuery = Depends(),
+) -> draw.PreviewRes:
+    input_path = Path(query.filename)
     if not input_path.exists():
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    config_path = Path(config_name)
+    config_path = Path(query.config_name)
     if not config_path.exists():
         raise HTTPException(
             status_code=404, detail=f"config {config_path} not found"
@@ -102,13 +87,11 @@ def observations_draw_monthly_preview(
     df = pl.read_parquet(input_path)
     fig = observations.draw_monthly_obs_days(df, config)
     img = utils.fig_to_base64(fig)
-    return ObservationsDrawPreviewRes(img=img)
+    return draw.PreviewRes(img=img)
 
 
-@router.post("/draw/monthly", response_model=ObservationsDrawSaveRes)
-def observations_draw_monthly_save(
-    body: ObservationsDrawSave,
-) -> ObservationsDrawSaveRes:
+@router.post("/draw/monthly", response_model=draw.SaveRes)
+def observations_draw_monthly_save(body: draw.SaveBody) -> draw.SaveRes:
     input_path = Path(body.input)
     if not input_path.exists():
         raise HTTPException(
@@ -140,7 +123,7 @@ def observations_draw_monthly_save(
         bbox_inches="tight",
         pad_inches=0.1,
     )
-    return ObservationsDrawSaveRes(output=str(output_path))
+    return draw.SaveRes(output=str(output_path))
 
 
 @router.get("/calendar", response_model=ObservationsCalendarRes)

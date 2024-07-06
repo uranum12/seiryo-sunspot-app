@@ -49,6 +49,9 @@ unfixable = [
 [tool.ruff.lint.isort]
 split-on-trailing-comma = false
 
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+
 [tool.ruff.lint.per-file-ignores]
 "api/tests/*.py" = [
   "S101",    # assert

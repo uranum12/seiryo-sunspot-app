@@ -10,12 +10,10 @@ type GetDrawParams = {
 }
 
 export async function getDraw(
+  path: string,
   params: GetDrawParams,
 ): Promise<GetDrawRes["img"]> {
-  const res = await get<GetDrawRes, GetDrawParams>(
-    "/api/butterfly/draw/butterfly",
-    params,
-  )
+  const res = await get<GetDrawRes, GetDrawParams>(path, params)
   return res.img
 }
 
@@ -32,11 +30,9 @@ type PostDrawBody = {
 }
 
 export async function postDraw(
+  path: string,
   body: PostDrawBody,
 ): Promise<PostDrawRes["output"]> {
-  const res = await post<PostDrawRes, PostDrawBody>(
-    "/api/butterfly/draw/butterfly",
-    body,
-  )
+  const res = await post<PostDrawRes, PostDrawBody>(path, body)
   return res.output
 }

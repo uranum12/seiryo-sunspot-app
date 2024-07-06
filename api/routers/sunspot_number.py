@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 import polars as pl
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from api.libs import sunspot_number, utils
@@ -10,6 +10,7 @@ from api.libs.sunspot_number_config import (
     SunspotNumberHemispheric,
     SunspotNumberWholeDisk,
 )
+from api.models import draw
 
 
 class SunspotNumberAgg(BaseModel):
@@ -21,22 +22,6 @@ class SunspotNumberAggRes(BaseModel):
     output_raw: str
     output_daily: str
     output_monthly: str
-
-
-class SunspotNumberDrawPreviewRes(BaseModel):
-    img: str
-
-
-class SunspotNumberDrawSave(BaseModel):
-    input: str
-    config: str
-    format: str
-    dpi: int = 300
-    overwrite: bool = False
-
-
-class SunspotNumberDrawSaveRes(BaseModel):
-    output: str
 
 
 router = APIRouter(prefix="/sunspot_number", tags=["sunspot_number"])
@@ -81,16 +66,16 @@ def sunspot_number_main(body: SunspotNumberAgg) -> SunspotNumberAggRes:
     )
 
 
-@router.get("/draw/whole_disk", response_model=SunspotNumberDrawPreviewRes)
+@router.get("/draw/whole_disk", response_model=draw.PreviewRes)
 def sunspot_number_draw_whole_disk(
-    filename: str, config_name: str
-) -> SunspotNumberDrawPreviewRes:
-    input_path = Path(filename)
+    query: draw.PreviewQuery = Depends(),
+) -> draw.PreviewRes:
+    input_path = Path(query.filename)
     if not input_path.exists():
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    config_path = Path(config_name)
+    config_path = Path(query.config_name)
     if not config_path.exists():
         raise HTTPException(
             status_code=404, detail=f"config {config_path} not found"
@@ -105,13 +90,11 @@ def sunspot_number_draw_whole_disk(
     df = pl.read_parquet(input_path)
     fig = sunspot_number.draw_sunspot_number_whole_disk(df, config)
     img = utils.fig_to_base64(fig)
-    return SunspotNumberDrawPreviewRes(img=img)
+    return draw.PreviewRes(img=img)
 
 
-@router.post("/draw/whole_disk", response_model=SunspotNumberDrawSaveRes)
-def sunspot_number_save_whole_disk(
-    body: SunspotNumberDrawSave,
-) -> SunspotNumberDrawSaveRes:
+@router.post("/draw/whole_disk", response_model=draw.SaveRes)
+def sunspot_number_save_whole_disk(body: draw.SaveBody) -> draw.SaveRes:
     input_path = Path(body.input)
     if not input_path.exists():
         raise HTTPException(
@@ -143,19 +126,19 @@ def sunspot_number_save_whole_disk(
         bbox_inches="tight",
         pad_inches=0.1,
     )
-    return SunspotNumberDrawSaveRes(output=str(output_path))
+    return draw.SaveRes(output=str(output_path))
 
 
-@router.get("/draw/hemispheric", response_model=SunspotNumberDrawPreviewRes)
+@router.get("/draw/hemispheric", response_model=draw.PreviewRes)
 def sunspot_number_draw_hemispheric(
-    filename: str, config_name: str
-) -> SunspotNumberDrawPreviewRes:
-    input_path = Path(filename)
+    query: draw.PreviewQuery = Depends(),
+) -> draw.PreviewRes:
+    input_path = Path(query.filename)
     if not input_path.exists():
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    config_path = Path(config_name)
+    config_path = Path(query.config_name)
     if not config_path.exists():
         raise HTTPException(
             status_code=404, detail=f"config {config_path} not found"
@@ -171,13 +154,11 @@ def sunspot_number_draw_hemispheric(
     df = pl.read_parquet(input_path)
     fig = sunspot_number.draw_sunspot_number_hemispheric(df, config)
     img = utils.fig_to_base64(fig)
-    return SunspotNumberDrawPreviewRes(img=img)
+    return draw.PreviewRes(img=img)
 
 
-@router.post("/draw/hemispheric", response_model=SunspotNumberDrawSaveRes)
-def sunspot_number_save_hemispheric(
-    body: SunspotNumberDrawSave,
-) -> SunspotNumberDrawSaveRes:
+@router.post("/draw/hemispheric", response_model=draw.SaveRes)
+def sunspot_number_save_hemispheric(body: draw.SaveBody) -> draw.SaveRes:
     input_path = Path(body.input)
     if not input_path.exists():
         raise HTTPException(
@@ -209,4 +190,4 @@ def sunspot_number_save_hemispheric(
         bbox_inches="tight",
         pad_inches=0.1,
     )
-    return SunspotNumberDrawSaveRes(output=str(output_path))
+    return draw.SaveRes(output=str(output_path))

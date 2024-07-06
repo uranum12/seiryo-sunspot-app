@@ -4,11 +4,12 @@ from pathlib import Path
 
 import numpy as np
 import polars as pl
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
 from api.libs import butterfly, utils
 from api.libs.butterfly_config import ButterflyDiagram
+from api.models import draw
 
 
 class ButterflyAgg(BaseModel):
@@ -27,22 +28,6 @@ class ButterflyAggRes(BaseModel):
     output_data: str
     output_image: str
     output_info: str
-
-
-class ButterflyDrawPreviewRes(BaseModel):
-    img: str
-
-
-class ButterflyDrawSave(BaseModel):
-    input: str
-    config: str
-    format: str
-    dpi: int = 300
-    overwrite: bool = False
-
-
-class ButterflyDrawSaveRes(BaseModel):
-    output: str
 
 
 router = APIRouter(prefix="/butterfly", tags=["butterfly"])
@@ -102,14 +87,14 @@ def butterfly_agg(body: ButterflyAgg) -> ButterflyAggRes:
     )
 
 
-@router.get("/draw/butterfly", response_model=ButterflyDrawPreviewRes)
-def butterfly_draw(filename: str, config_name: str) -> ButterflyDrawPreviewRes:
-    input_path = Path(filename)
+@router.get("/draw/butterfly", response_model=draw.PreviewRes)
+def butterfly_draw(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
+    input_path = Path(query.filename)
     if not input_path.exists():
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    config_path = Path(config_name)
+    config_path = Path(query.config_name)
     if not config_path.exists():
         raise HTTPException(
             status_code=404, detail=f"config {config_path} not found"
@@ -127,11 +112,11 @@ def butterfly_draw(filename: str, config_name: str) -> ButterflyDrawPreviewRes:
         info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
     fig = butterfly.draw_butterfly_diagram(img, info, config)
     img = utils.fig_to_base64(fig)
-    return ButterflyDrawPreviewRes(img=img)
+    return draw.PreviewRes(img=img)
 
 
-@router.post("/draw/butterfly", response_model=ButterflyDrawSaveRes)
-def butterfly_save(body: ButterflyDrawSave) -> ButterflyDrawSaveRes:
+@router.post("/draw/butterfly", response_model=draw.SaveRes)
+def butterfly_save(body: draw.SaveBody) -> draw.SaveRes:
     input_path = Path(body.input)
     if not input_path.exists():
         raise HTTPException(
@@ -166,4 +151,4 @@ def butterfly_save(body: ButterflyDrawSave) -> ButterflyDrawSaveRes:
         bbox_inches="tight",
         pad_inches=0.1,
     )
-    return ButterflyDrawSaveRes(output=str(output_path))
+    return draw.SaveRes(output=str(output_path))
