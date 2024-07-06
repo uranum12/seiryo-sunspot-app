@@ -65,7 +65,7 @@
 
 <header class="mb-4 px-8">
   {#each paths as navs}
-    <div class="mb-1 flex space-x-2">
+    <div class="mb-1 flex space-x-2 overflow-x-auto">
       {#each navs as nav}
         <a
           href={nav.path}
