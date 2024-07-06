@@ -112,16 +112,21 @@
   </section>
 {/await}
 
+{#if date}
+  <section>
+    <div class="flex justify-between">
+      <button onclick={previousMonth}>previous month</button>
+      <div>{`${getYear(date)}-${getMonth(date) + 1}`}</div>
+      <button onclick={nextMonth}>next month</button>
+    </div>
+  </section>
+{/if}
+
 {#if calendarPromise && date}
   {#await calendarPromise}
     <p>loading...</p>
   {:then calendar}
     <section>
-      <div class="mb-1 flex justify-between">
-        <button onclick={previousMonth}>previous month</button>
-        <div>{`${getYear(date)}-${getMonth(date) + 1}`}</div>
-        <button onclick={nextMonth}>next month</button>
-      </div>
       <table
         class="w-full table-fixed border-separate border-spacing-0 overflow-hidden break-words rounded border border-gray-300"
       >
