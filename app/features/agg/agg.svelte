@@ -1,11 +1,11 @@
 <script lang="ts">
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
+  import FileSelect from "@/components/file_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
   import { getFiles } from "./api/files"
-  import FileSelect from "./components/file_select.svelte"
 
   let selected = $state<string[]>([])
   let filename = $state<string>("")

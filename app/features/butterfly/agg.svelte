@@ -2,12 +2,12 @@
   import Accordion from "@/components/accordion.svelte"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
+  import DateSelect from "@/components/date_select.svelte"
+  import IntervalSelect from "@/components/interval_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
   import { getFilesAgg } from "./api/files"
-  import DateSelect from "./components/date_select.svelte"
-  import IntervalSelect from "./components/interval_select.svelte"
 
   let inputName = $state<string>("")
   let outputName = $state<string>("")
