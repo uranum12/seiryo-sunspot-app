@@ -35,7 +35,7 @@
   })
 </script>
 
-<div class="{className} flex justify-between">
+<div class="{className} flex justify-between gap-x-1">
   <input
     type="number"
     min="1000"
@@ -46,7 +46,6 @@
   />
   <input
     type="number"
-    class="mx-1"
     min="1"
     max="12"
     placeholder="month"

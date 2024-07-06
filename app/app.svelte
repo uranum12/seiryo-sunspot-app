@@ -64,19 +64,21 @@
 <svelte:window on:hashchange={getPageName} />
 
 <header class="mb-4 px-8">
-  {#each paths as navs}
-    <div class="mb-1 flex space-x-2 overflow-x-auto">
-      {#each navs as nav}
-        <a
-          href={nav.path}
-          class="block border-b-4 border-gray-300 px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
-          class:!border-blue-300={nav.selected}
-        >
-          {nav.name}
-        </a>
-      {/each}
-    </div>
-  {/each}
+  <nav class="space-y-1">
+    {#each paths as navs}
+      <div class="flex space-x-2 overflow-x-auto">
+        {#each navs as nav}
+          <a
+            href={nav.path}
+            class="block border-b-4 border-gray-300 px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
+            class:!border-blue-300={nav.selected}
+          >
+            {nav.name}
+          </a>
+        {/each}
+      </div>
+    {/each}
+  </nav>
 </header>
 
 <main class="px-8">

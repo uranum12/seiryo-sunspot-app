@@ -90,14 +90,14 @@
 {:then result}
   {@const [files, configs] = result}
   {#if files.length !== 0}
-    <section>
-      <select class="mb-1" required bind:value={fileNamePreview}>
+    <section class="space-y-1">
+      <select required bind:value={fileNamePreview}>
         <option value="" selected disabled>select file</option>
         {#each files.sort() as file}
           <option value={file}>{file.replace(/^out\//, "")}</option>
         {/each}
       </select>
-      <select class="mb-1" required bind:value={configNamePreview}>
+      <select required bind:value={configNamePreview}>
         <option value={defaultConfig} selected>default</option>
         {#each configs.sort() as config}
           <option value={config}>{config.replace(/^config\//, "")}</option>
@@ -130,8 +130,8 @@
       <img src={`data:image/png;base64,${preview}`} alt="{imageAlt} preview" />
     </section>
 
-    <section>
-      <select class="mb-1" required bind:value={format}>
+    <section class="space-y-1">
+      <select required bind:value={format}>
         <option value="" selected disabled>select file format</option>
         {#each formatList as format}
           <option value={format.format}>
@@ -139,14 +139,8 @@
           </option>
         {/each}
       </select>
-      <input
-        type="number"
-        class="mb-1"
-        required
-        placeholder="dpi"
-        bind:value={dpi}
-      />
-      <label class="mb-1">
+      <input type="number" required placeholder="dpi" bind:value={dpi} />
+      <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
       </label>

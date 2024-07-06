@@ -76,17 +76,16 @@
 {#await filesPromise}
   <p>loading...</p>
 {:then files}
-  <section>
-    <select class="mb-1" required bind:value={filename}>
+  <section class="space-y-1">
+    <select required bind:value={filename}>
       <option value="" selected disabled>select file</option>
       {#each files.sort() as file}
         <option value={file}>{file.replace(/^out\//, "")}</option>
       {/each}
     </select>
-    <div class="mb-1 flex justify-between">
+    <div class="flex justify-between gap-x-1">
       <input
         type="number"
-        class="mr-1"
         required
         placeholder="year"
         min="1000"

@@ -45,14 +45,14 @@
   <p>loading...</p>
 {:then files}
   {#if files.length !== 0}
-    <section>
+    <section class="space-y-1">
       <select required bind:value={filename}>
         <option value="" selected disabled>select file</option>
         {#each files.sort() as file}
           <option value={file}>{file.replace(/^out\//, "")}</option>
         {/each}
       </select>
-      <label class="my-1">
+      <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
       </label>

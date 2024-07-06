@@ -63,41 +63,36 @@
   <p>loading...</p>
 {:then files}
   {#if files.length !== 0}
-    <section>
-      <select class="mb-1" required bind:value={inputName}>
+    <section class="space-y-1">
+      <select required bind:value={inputName}>
         <option value="" selected disabled>select file</option>
         {#each files.sort() as file}
           <option value={file}>{file.replace(/^out\//, "")}</option>
         {/each}
       </select>
-      <input
-        class="mb-1"
-        placeholder="output file name"
-        required
-        bind:value={outputName}
-      />
-      <Accordion class="mb-1" summary="advanced settings">
-        <input
-          type="number"
-          class="mb-1"
-          placeholder="latitude min value"
-          min="-90"
-          max="90"
-          bind:value={latMin}
-        />
-        <input
-          type="number"
-          class="mb-1"
-          placeholder="latitude max value"
-          min="-90"
-          max="90"
-          bind:value={latMax}
-        />
-        <DateSelect class="mb-1" bind:date={dateStart} />
-        <DateSelect class="mb-1" bind:date={dateEnd} />
-        <IntervalSelect bind:interval={dateInterval} />
+      <input placeholder="output file name" required bind:value={outputName} />
+      <Accordion summary="advanced settings">
+        <div class="space-y-1">
+          <input
+            type="number"
+            placeholder="latitude min value"
+            min="-90"
+            max="90"
+            bind:value={latMin}
+          />
+          <input
+            type="number"
+            placeholder="latitude max value"
+            min="-90"
+            max="90"
+            bind:value={latMax}
+          />
+          <DateSelect bind:date={dateStart} />
+          <DateSelect bind:date={dateEnd} />
+          <IntervalSelect bind:interval={dateInterval} />
+        </div>
       </Accordion>
-      <label class="mb-1">
+      <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
       </label>

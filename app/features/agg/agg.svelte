@@ -50,15 +50,10 @@
   <p>loading...</p>
 {:then files}
   {#if files.length !== 0}
-    <section>
-      <FileSelect class="mb-1" {files} bind:selected />
-      <input
-        class="mb-1"
-        placeholder="output file name"
-        required
-        bind:value={filename}
-      />
-      <label class="mb-1">
+    <section class="space-y-1">
+      <FileSelect {files} bind:selected />
+      <input placeholder="output file name" required bind:value={filename} />
+      <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
       </label>

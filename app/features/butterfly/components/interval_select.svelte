@@ -22,7 +22,7 @@
   })
 </script>
 
-<div class="justify-content flex">
+<div class="justify-content flex gap-x-1">
   <input
     type="number"
     min="1"
@@ -32,7 +32,6 @@
   />
   <input
     type="number"
-    class="mx-1"
     min="1"
     placeholder="months"
     {required}

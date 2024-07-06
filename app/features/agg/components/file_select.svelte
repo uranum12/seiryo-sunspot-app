@@ -46,8 +46,8 @@
   }
 </script>
 
-<div class={className}>
-  <Accordion class="mb-1" summary="filter">
+<div class="{className} space-y-1">
+  <Accordion summary="filter">
     <input bind:value={filter} class="mb-1" />
     <button onclick={filterApply}>apply</button>
     <button onclick={filterClear}>clear</button>
@@ -58,7 +58,7 @@
       <p>no files matched</p>
     </Alert>
   {:else}
-    <div class="mb-1">
+    <div>
       <button onclick={selectAll}>select all files</button>
       <button onclick={deselectAll}>deselect all files</button>
     </div>
