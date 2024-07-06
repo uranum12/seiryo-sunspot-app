@@ -22,7 +22,7 @@
 
   let showConfirmOverwrite = $state<boolean>(false)
 
-  const submitDisabled = $derived(format === "" || dpi === null)
+  const submitDisabled = $derived(format === "" || !dpi)
 
   const submit = () => {
     onSubmit({ format, dpi, overwrite })

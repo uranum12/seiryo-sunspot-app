@@ -22,7 +22,7 @@
   })
 </script>
 
-<div class="flex justify-content">
+<div class="justify-content flex">
   <input
     type="number"
     min="1"

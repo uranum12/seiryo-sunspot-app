@@ -65,11 +65,11 @@
 
 <header class="mb-4 px-8">
   {#each paths as navs}
-    <div class="flex mb-1 space-x-2">
+    <div class="mb-1 flex space-x-2">
       {#each navs as nav}
         <a
           href={nav.path}
-          class="block px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none border-b-4 border-gray-300"
+          class="block border-b-4 border-gray-300 px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
           class:!border-blue-300={nav.selected}
         >
           {nav.name}

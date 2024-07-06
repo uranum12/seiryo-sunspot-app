@@ -37,7 +37,7 @@
   }
 </script>
 
-<dialog class="border rounded border-yellow-400 px-4 py-3" bind:this={dialog}>
+<dialog class="rounded border border-yellow-400 px-4 py-3" bind:this={dialog}>
   <p>
     {@render children()}
   </p>

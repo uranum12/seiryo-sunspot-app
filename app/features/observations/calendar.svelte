@@ -6,8 +6,6 @@
     getMonth,
     getYear,
     isSameMonth,
-    isSaturday,
-    isSunday,
     subMonths,
   } from "date-fns"
   import { untrack } from "svelte"
@@ -30,7 +28,7 @@
     $state<ReturnType<typeof getFilesCalendar>>(getFilesCalendar())
   let calendarPromise = $state<ReturnType<typeof getCalendar>>()
 
-  const submitDisabled = $derived<boolean>(filename.trim() === "")
+  const submitDisabled = $derived(filename.trim() === "" || !year || !month)
 
   const fetchFiles = () => {
     filesPromise = getFilesCalendar()
@@ -79,7 +77,7 @@
   <p>loading...</p>
 {:then files}
   <section>
-    <select class="mb-1" bind:value={filename}>
+    <select class="mb-1" required bind:value={filename}>
       <option value="" selected disabled>select file</option>
       {#each files.sort() as file}
         <option value={file}>{file.replace(/^out\//, "")}</option>
@@ -89,6 +87,7 @@
       <input
         type="number"
         class="mr-1"
+        required
         placeholder="year"
         min="1000"
         max="3000"
@@ -96,6 +95,7 @@
       />
       <input
         type="number"
+        required
         placeholder="month"
         min="1"
         max="12"
@@ -123,12 +123,12 @@
         <button onclick={nextMonth}>next month</button>
       </div>
       <table
-        class="w-full table-fixed break-words border rounded border-gray-300 border-separate border-spacing-0 overflow-hidden"
+        class="w-full table-fixed border-separate border-spacing-0 overflow-hidden break-words rounded border border-gray-300"
       >
         <thead>
           <tr>
             {#each getWeek() as week}
-              <th class="p-2 border-r border-gray-300 last:border-r-0">
+              <th class="border-r border-gray-300 p-2 last:border-r-0">
                 {week}
               </th>
             {/each}
@@ -140,7 +140,7 @@
               {#each week as day}
                 {@const weekday = getDay(day.date)}
                 <td
-                  class="p-2 border-r border-t border-gray-300 group-first:border-t-2 last:border-r-0 text-center"
+                  class="border-r border-t border-gray-300 p-2 text-center last:border-r-0 group-first:border-t-2"
                   class:bg-gray-200={!day.obs}
                   class:text-blue-500={weekday === 6}
                   class:text-red-500={weekday === 0}

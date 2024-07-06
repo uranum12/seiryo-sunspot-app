@@ -40,7 +40,7 @@
 </script>
 
 <section>
-  <select class="mb-1" bind:value={filename}>
+  <select class="mb-1" required bind:value={filename}>
     <option value="" selected disabled>select file</option>
     {#each files.sort() as file}
       <option value={file}>{file.replace(/^out\//, "")}</option>

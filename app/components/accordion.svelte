@@ -10,9 +10,9 @@
   let { summary, class: className, children }: Props = $props()
 </script>
 
-<details class="{className} w-full border rounded border-gray-300 group">
+<details class="{className} group w-full rounded border border-gray-300">
   <summary
-    class="p-2 border-gray-300 focus:outline-blue-500 group-open:border-b"
+    class="border-gray-300 p-2 focus:outline-blue-500 group-open:border-b"
   >
     {summary}
   </summary>
