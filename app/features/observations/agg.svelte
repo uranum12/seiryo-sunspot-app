@@ -1,10 +1,17 @@
 <script lang="ts">
   import Alert from "@/components/alert.svelte"
+  import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
   import { getFilesAgg } from "./api/files"
-  import FileForm, { type FormInput } from "./components/file_form.svelte"
+
+  let filename = $state<string>("")
+  let overwrite = $state<boolean>(false)
+
+  let showConfirmOverwrite = $state<boolean>(false)
+
+  const submitDisabled = $derived<boolean>(filename.trim() === "")
 
   let filesPromise = $state<ReturnType<typeof getFilesAgg>>(getFilesAgg())
   let aggPromise = $state<ReturnType<typeof postAgg>>()
@@ -14,8 +21,19 @@
     filesPromise = getFilesAgg()
   }
 
-  const submitAgg = (input: FormInput) => {
-    aggPromise = postAgg(input)
+  const submitAgg = () => {
+    aggPromise = postAgg({
+      filename,
+      overwrite,
+    })
+  }
+
+  const clickSubmit = () => {
+    if (overwrite) {
+      showConfirmOverwrite = true
+    } else {
+      submitAgg()
+    }
   }
 </script>
 
@@ -27,7 +45,23 @@
   <p>loading...</p>
 {:then files}
   {#if files.length !== 0}
-    <FileForm {files} onSubmit={submitAgg} />
+    <section>
+      <select class="mb-1" required bind:value={filename}>
+        <option value="" selected disabled>select file</option>
+        {#each files.sort() as file}
+          <option value={file}>{file.replace(/^out\//, "")}</option>
+        {/each}
+      </select>
+      <label class="mb-1">
+        <input type="checkbox" bind:checked={overwrite} />
+        <span>Overwrite</span>
+      </label>
+      <button disabled={submitDisabled} onclick={clickSubmit}>submit</button>
+    </section>
+
+    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitAgg}>
+      Are you sure you want me to overwrite file {filename}.parquet ?
+    </ConfirmDialog>
   {:else}
     <section>
       <Alert type="warning">

@@ -1,10 +1,29 @@
 <script lang="ts">
+  import Accordion from "@/components/accordion.svelte"
   import Alert from "@/components/alert.svelte"
+  import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
   import { getFilesAgg } from "./api/files"
-  import FileForm, { type FormInput } from "./components/file_form.svelte"
+  import DateSelect from "./components/date_select.svelte"
+  import IntervalSelect from "./components/interval_select.svelte"
+
+  let inputName = $state<string>("")
+  let outputName = $state<string>("")
+  let overwrite = $state<boolean>(false)
+
+  let latMin = $state<number>()
+  let latMax = $state<number>()
+  let dateStart = $state<string>()
+  let dateEnd = $state<string>()
+  let dateInterval = $state<string>()
+
+  let showConfirmOverwrite = $state<boolean>(false)
+
+  const submitDisabled = $derived<boolean>(
+    inputName.trim() === "" || outputName.trim() === ""
+  )
 
   let filesPromise = $state<ReturnType<typeof getFilesAgg>>(getFilesAgg())
   let aggPromise = $state<ReturnType<typeof postAgg>>()
@@ -14,8 +33,25 @@
     filesPromise = getFilesAgg()
   }
 
-  const submitAgg = (input: FormInput) => {
-    aggPromise = postAgg(input)
+  const submitAgg = () => {
+    aggPromise = postAgg({
+      inputName,
+      outputName,
+      overwrite,
+      latMin,
+      latMax,
+      dateStart,
+      dateEnd,
+      dateInterval,
+    })
+  }
+
+  const clickSubmit = () => {
+    if (overwrite) {
+      showConfirmOverwrite = true
+    } else {
+      submitAgg()
+    }
   }
 </script>
 
@@ -27,7 +63,50 @@
   <p>loading...</p>
 {:then files}
   {#if files.length !== 0}
-    <FileForm {files} onSubmit={submitAgg} />
+    <section>
+      <select class="mb-1" required bind:value={inputName}>
+        <option value="" selected disabled>select file</option>
+        {#each files.sort() as file}
+          <option value={file}>{file.replace(/^out\//, "")}</option>
+        {/each}
+      </select>
+      <input
+        class="mb-1"
+        placeholder="output file name"
+        required
+        bind:value={outputName}
+      />
+      <Accordion class="mb-1" summary="advanced settings">
+        <input
+          type="number"
+          class="mb-1"
+          placeholder="latitude min value"
+          min="-90"
+          max="90"
+          bind:value={latMin}
+        />
+        <input
+          type="number"
+          class="mb-1"
+          placeholder="latitude max value"
+          min="-90"
+          max="90"
+          bind:value={latMax}
+        />
+        <DateSelect class="mb-1" bind:date={dateStart} />
+        <DateSelect class="mb-1" bind:date={dateEnd} />
+        <IntervalSelect bind:interval={dateInterval} />
+      </Accordion>
+      <label class="mb-1">
+        <input type="checkbox" bind:checked={overwrite} />
+        <span>Overwrite</span>
+      </label>
+      <button disabled={submitDisabled} onclick={clickSubmit}>submit</button>
+    </section>
+
+    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitAgg}>
+      Are you sure you want me to overwrite file ?
+    </ConfirmDialog>
   {:else}
     <section>
       <Alert type="warning">
