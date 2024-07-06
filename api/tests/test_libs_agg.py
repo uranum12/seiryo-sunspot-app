@@ -204,7 +204,7 @@ def test_convert_date(in_date: str, out_date: date) -> None:
 def test_convert_coord(
     in_data: str,
     in_col: str,
-    in_dtype: pl.PolarsDataType,
+    in_dtype: type[pl.DataType],
     out_min: int,
     out_max: int,
 ) -> None:

@@ -22,7 +22,7 @@ def convert_date(df: pl.LazyFrame) -> pl.LazyFrame:
 
 
 def convert_coord(
-    df: pl.LazyFrame, *, col: str, dtype: pl.PolarsDataType
+    df: pl.LazyFrame, *, col: str, dtype: type[pl.DataType]
 ) -> pl.LazyFrame:
     pat_left_sign = r"(?P<left_sign>[nsewpm+-]?)"
     pat_left = r"(?P<left>\d{1,2}(?:\.\d+)?)"
