@@ -109,13 +109,11 @@
       <p>loading...</p>
     {:then calendar}
       <section>
-        <table
-          class="w-full table-fixed border-separate border-spacing-0 overflow-hidden break-words rounded border border-gray-300"
-        >
+        <table>
           <thead>
             <tr>
               {#each getWeek() as week}
-                <th class="border-r border-gray-300 p-2 last:border-r-0">
+                <th class="border-b-2">
                   {week}
                 </th>
               {/each}
@@ -123,11 +121,10 @@
           </thead>
           <tbody>
             {#each calendar as week}
-              <tr class="group">
+              <tr>
                 {#each week as day}
                   {@const weekday = getDay(day.date)}
                   <td
-                    class="border-r border-t border-gray-300 p-2 text-center last:border-r-0 group-first:border-t-2"
                     class:bg-gray-200={!day.obs}
                     class:text-blue-500={weekday === 6}
                     class:text-red-500={weekday === 0}

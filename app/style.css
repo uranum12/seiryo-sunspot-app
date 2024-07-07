@@ -28,4 +28,19 @@
   img {
     @apply mx-auto h-auto max-w-full border border-gray-300;
   }
+  table {
+    @apply w-full table-fixed border-separate border-spacing-0;
+    @apply overflow-hidden break-words rounded border border-gray-300;
+    > tr:last-child > td,
+    > * > tr:last-child > td {
+      @apply border-b-0;
+    }
+    > * > th,
+    > * > * > th,
+    > * > td,
+    > * > * > td {
+      @apply p-2 text-center;
+      @apply border-b border-r border-gray-300 last:border-r-0;
+    }
+  }
 }
