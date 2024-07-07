@@ -2,6 +2,7 @@
   import Agg from "@/pages/agg/agg.svelte"
   import ButterflyAgg from "@/pages/butterfly/agg.svelte"
   import ButterflyDraw from "@/pages/butterfly/draw.svelte"
+  import CheckFile from "@/pages/check/file.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
   import ObservationsCalendar from "@/pages/observations/calendar.svelte"
   import ObservationsMonthly from "@/pages/observations/monthly.svelte"
@@ -21,6 +22,11 @@
   const pages: Page[] = [
     { path: "", name: "Home", page: Agg },
     { path: "agg", name: "Agg", page: Agg },
+    {
+      path: "check",
+      name: "Check",
+      children: [{ path: "file", name: "File", page: CheckFile }],
+    },
     {
       path: "sunspot_number",
       name: "Sunspot Number",
