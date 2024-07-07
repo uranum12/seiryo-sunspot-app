@@ -10,13 +10,13 @@
     toDate,
   } from "date-fns"
 
+  import { getFiles } from "@/api/files"
   import Alert from "@/components/alert.svelte"
   import DateSelect from "@/components/date_select.svelte"
   import { formatDate, fromDate } from "@/utils/date"
   import { FetchError } from "@/utils/fetch"
 
   import { getCalendar } from "./api/calendar"
-  import { getFilesCalendar } from "./api/files"
 
   let filename = $state<string>("")
   let date = $state<string>()
@@ -25,8 +25,11 @@
 
   let currentDate = $state<Date>()
 
-  let filesPromise =
-    $state<ReturnType<typeof getFilesCalendar>>(getFilesCalendar())
+  const getFilesCalendar = () => {
+    return getFiles({ path: "out/observations", glob: "*/daily.parquet" })
+  }
+
+  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesCalendar())
   let calendarPromise = $state<ReturnType<typeof getCalendar>>()
 
   const submitDisabled = $derived(filename.trim() === "" || !date)

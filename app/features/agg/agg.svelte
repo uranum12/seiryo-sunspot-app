@@ -1,11 +1,11 @@
 <script lang="ts">
+  import { getFiles } from "@/api/files"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import FileSelect from "@/components/file_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
-  import { getFiles } from "./api/files"
 
   let selected = $state<string[]>([])
   let filename = $state<string>("")
@@ -17,12 +17,16 @@
     selected.length === 0 || filename.trim() === ""
   )
 
-  let filesPromise = $state<ReturnType<typeof getFiles>>(getFiles())
+  const getFilesAgg = () => {
+    return getFiles({ path: "data", glob: "*.csv" })
+  }
+
+  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesAgg())
   let aggPromise = $state<ReturnType<typeof postAgg> | undefined>(undefined)
 
   const fetchFiles = () => {
     aggPromise = undefined
-    filesPromise = getFiles()
+    filesPromise = getFilesAgg()
   }
 
   const submitAgg = () => {

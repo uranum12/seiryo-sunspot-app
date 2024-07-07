@@ -1,10 +1,10 @@
 <script lang="ts">
+  import { getFiles } from "@/api/files"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import { FetchError } from "@/utils/fetch"
 
   import { postAgg } from "./api/agg"
-  import { getFilesAgg } from "./api/files"
 
   let filename = $state<string>("")
   let overwrite = $state<boolean>(false)
@@ -13,7 +13,11 @@
 
   const submitDisabled = $derived<boolean>(filename.trim() === "")
 
-  let filesPromise = $state<ReturnType<typeof getFilesAgg>>(getFilesAgg())
+  const getFilesAgg = () => {
+    return getFiles({ path: "out", glob: "*.parquet" })
+  }
+
+  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesAgg())
   let aggPromise = $state<ReturnType<typeof postAgg>>()
 
   const fetchFiles = () => {
