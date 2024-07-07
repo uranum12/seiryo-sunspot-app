@@ -1,24 +1,35 @@
 <script lang="ts">
+  import { postAgg } from "@/api/butterfly/agg"
   import { getFiles } from "@/api/files"
+  import Accordion from "@/components/accordion.svelte"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
+  import DateSelect from "@/components/date_select.svelte"
+  import IntervalSelect from "@/components/interval_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
-  import { postAgg } from "./api/agg"
-
-  let filename = $state<string>("")
+  let inputName = $state<string>("")
+  let outputName = $state<string>("")
   let overwrite = $state<boolean>(false)
+
+  let latMin = $state<number>()
+  let latMax = $state<number>()
+  let dateStart = $state<string>()
+  let dateEnd = $state<string>()
+  let dateInterval = $state<string>()
 
   let showConfirmOverwrite = $state<boolean>(false)
 
-  const submitDisabled = $derived<boolean>(filename.trim() === "")
+  const submitDisabled = $derived<boolean>(
+    inputName.trim() === "" || outputName.trim() === ""
+  )
 
   const getFilesAgg = () => {
     return getFiles({ path: "out", glob: "*.parquet" })
   }
 
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesAgg())
-  let aggPromise = $state<ReturnType<typeof postAgg> | undefined>(undefined)
+  let aggPromise = $state<ReturnType<typeof postAgg>>()
 
   const fetchFiles = () => {
     aggPromise = undefined
@@ -27,8 +38,14 @@
 
   const submitAgg = () => {
     aggPromise = postAgg({
-      filename,
+      inputName,
+      outputName,
       overwrite,
+      latMin,
+      latMax,
+      dateStart,
+      dateEnd,
+      dateInterval,
     })
   }
 
@@ -50,12 +67,34 @@
 {:then files}
   {#if files.length !== 0}
     <section class="space-y-1">
-      <select required bind:value={filename}>
+      <select required bind:value={inputName}>
         <option value="" selected disabled>select file</option>
         {#each files.sort() as file}
           <option value={file}>{file.replace(/^out\//, "")}</option>
         {/each}
       </select>
+      <input placeholder="output file name" required bind:value={outputName} />
+      <Accordion summary="advanced settings">
+        <div class="space-y-1">
+          <input
+            type="number"
+            placeholder="latitude min value"
+            min="-90"
+            max="90"
+            bind:value={latMin}
+          />
+          <input
+            type="number"
+            placeholder="latitude max value"
+            min="-90"
+            max="90"
+            bind:value={latMax}
+          />
+          <DateSelect bind:date={dateStart} />
+          <DateSelect bind:date={dateEnd} />
+          <IntervalSelect bind:interval={dateInterval} />
+        </div>
+      </Accordion>
       <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
@@ -64,7 +103,7 @@
     </section>
 
     <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitAgg}>
-      Are you sure you want me to overwrite file {filename}.parquet ?
+      Are you sure you want me to overwrite file ?
     </ConfirmDialog>
   {:else}
     <section>
@@ -87,9 +126,9 @@
   {:then output}
     <section>
       <Alert type="success">
-        <p>file {output.outputRaw} generated</p>
-        <p>file {output.outputDaily} generated</p>
-        <p>file {output.outputMonthly} generated</p>
+        <p>file {output.outputData} generated</p>
+        <p>file {output.outputImage} generated</p>
+        <p>file {output.outputInfo} generated</p>
       </Alert>
     </section>
   {:catch e}

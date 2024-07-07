@@ -11,12 +11,11 @@
   } from "date-fns"
 
   import { getFiles } from "@/api/files"
+  import { getCalendar } from "@/api/observations/calendar"
   import Alert from "@/components/alert.svelte"
   import DateSelect from "@/components/date_select.svelte"
   import { formatDate, fromDate } from "@/utils/date"
   import { FetchError } from "@/utils/fetch"
-
-  import { getCalendar } from "./api/calendar"
 
   let filename = $state<string>("")
   let date = $state<string>()

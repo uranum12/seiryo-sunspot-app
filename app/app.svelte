@@ -1,13 +1,13 @@
 <script lang="ts">
-  import Agg from "@/features/agg/agg.svelte"
-  import ButterflyAgg from "@/features/butterfly/agg.svelte"
-  import ButterflyDraw from "@/features/butterfly/draw.svelte"
-  import ObservationsAgg from "@/features/observations/agg.svelte"
-  import ObservationsCalendar from "@/features/observations/calendar.svelte"
-  import ObservationsMonthly from "@/features/observations/monthly.svelte"
-  import SunspotNumberAgg from "@/features/sunspot_number/agg.svelte"
-  import SunspotNumberHemispheric from "@/features/sunspot_number/hemispheric.svelte"
-  import SunspotNumberWholeDisk from "@/features/sunspot_number/whole_disk.svelte"
+  import Agg from "@/pages/agg/agg.svelte"
+  import ButterflyAgg from "@/pages/butterfly/agg.svelte"
+  import ButterflyDraw from "@/pages/butterfly/draw.svelte"
+  import ObservationsAgg from "@/pages/observations/agg.svelte"
+  import ObservationsCalendar from "@/pages/observations/calendar.svelte"
+  import ObservationsMonthly from "@/pages/observations/monthly.svelte"
+  import SunspotNumberAgg from "@/pages/sunspot_number/agg.svelte"
+  import SunspotNumberHemispheric from "@/pages/sunspot_number/hemispheric.svelte"
+  import SunspotNumberWholeDisk from "@/pages/sunspot_number/whole_disk.svelte"
   import { type Page, searchPage, searchPath } from "@/utils/pages"
 
   let currentPath = $state<string[]>([""])

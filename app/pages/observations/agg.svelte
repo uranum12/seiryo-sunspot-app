@@ -1,10 +1,9 @@
 <script lang="ts">
   import { getFiles } from "@/api/files"
+  import { postAgg } from "@/api/observations/agg"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import { FetchError } from "@/utils/fetch"
-
-  import { postAgg } from "./api/agg"
 
   let filename = $state<string>("")
   let overwrite = $state<boolean>(false)

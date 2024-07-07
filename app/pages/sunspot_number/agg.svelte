@@ -1,24 +1,19 @@
 <script lang="ts">
   import { getFiles } from "@/api/files"
+  import { postAgg } from "@/api/sunspot_number/agg"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
-  import FileSelect from "@/components/file_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
-  import { postAgg } from "./api/agg"
-
-  let selected = $state<string[]>([])
   let filename = $state<string>("")
   let overwrite = $state<boolean>(false)
 
   let showConfirmOverwrite = $state<boolean>(false)
 
-  const submitDisabled = $derived(
-    selected.length === 0 || filename.trim() === ""
-  )
+  const submitDisabled = $derived<boolean>(filename.trim() === "")
 
   const getFilesAgg = () => {
-    return getFiles({ path: "data", glob: "*.csv" })
+    return getFiles({ path: "out", glob: "*.parquet" })
   }
 
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesAgg())
@@ -31,7 +26,6 @@
 
   const submitAgg = () => {
     aggPromise = postAgg({
-      files: selected,
       filename,
       overwrite,
     })
@@ -55,8 +49,12 @@
 {:then files}
   {#if files.length !== 0}
     <section class="space-y-1">
-      <FileSelect {files} bind:selected />
-      <input placeholder="output file name" required bind:value={filename} />
+      <select required bind:value={filename}>
+        <option value="" selected disabled>select file</option>
+        {#each files.sort() as file}
+          <option value={file}>{file.replace(/^out\//, "")}</option>
+        {/each}
+      </select>
       <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
@@ -88,7 +86,9 @@
   {:then output}
     <section>
       <Alert type="success">
-        <p>file {output} generated</p>
+        <p>file {output.outputRaw} generated</p>
+        <p>file {output.outputDaily} generated</p>
+        <p>file {output.outputMonthly} generated</p>
       </Alert>
     </section>
   {:catch e}
