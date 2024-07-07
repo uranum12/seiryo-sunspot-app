@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { formatDuration } from "@/utils/date"
+
   type Props = {
     interval: string | undefined
     required?: boolean
@@ -6,16 +8,13 @@
 
   let { interval = $bindable(), required }: Props = $props()
 
-  let years = $state<string>()
-  let months = $state<string>()
-  let days = $state<string>()
+  let years = $state<number>()
+  let months = $state<number>()
+  let days = $state<number>()
 
   $effect(() => {
     if (years || months || days) {
-      const yearsString = years ? `${years}Y` : ""
-      const monthsString = months ? `${months}M` : ""
-      const daysString = days ? `${days}D` : ""
-      interval = `P${yearsString}${monthsString}${daysString}`
+      interval = formatDuration(years, months, days)
     } else {
       interval = undefined
     }

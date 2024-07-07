@@ -1,33 +1,28 @@
 <script lang="ts">
-  import { getDate, getMonth, getYear } from "date-fns"
+  import { formatDate, toDate, validateDate } from "@/utils/date"
 
   type Props = {
     date: string | undefined
     class?: string
     required?: boolean
+    dayHidden?: boolean
   }
 
   let {
     date = $bindable(),
     class: className,
     required = false,
+    dayHidden: hidden = false,
   }: Props = $props()
 
   let year = $state<number>()
   let month = $state<number>()
-  let day = $state<number>()
-
-  const validateDate = (year: number, month: number, day: number) => {
-    const dt = new Date(year, month - 1, day)
-    return (
-      getYear(dt) === year && getMonth(dt) === month - 1 && getDate(dt) === day
-    )
-  }
+  let day = $state<number | undefined>(hidden ? 1 : undefined)
 
   $effect(() => {
     if (year && month && day) {
       if (validateDate(year, month, day)) {
-        date = `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`
+        date = formatDate(toDate(year, month, day))
       } else {
         date = undefined
       }
@@ -58,6 +53,7 @@
     max="31"
     placeholder="day"
     {required}
+    {hidden}
     bind:value={day}
   />
 </div>
