@@ -40,7 +40,15 @@
     > * > td,
     > * > * > td {
       @apply p-2 text-center;
-      @apply border-b border-r border-gray-300 last:border-r-0;
+      @apply border-r border-gray-300 last:border-r-0;
+    }
+    > * > th,
+    > * > * > th {
+      @apply border-b-2;
+    }
+    > * > td,
+    > * > * > td {
+      @apply border-b;
     }
   }
 }

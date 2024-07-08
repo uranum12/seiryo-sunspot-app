@@ -113,7 +113,7 @@
           <thead>
             <tr>
               {#each getWeek() as week}
-                <th class="border-b-2">
+                <th>
                   {week}
                 </th>
               {/each}
