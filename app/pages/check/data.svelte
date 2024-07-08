@@ -108,7 +108,7 @@
   </section>
 {/await}
 
-{#snippet showError(name: string, headers: string[], data: (string | number | number[])}
+{#snippet showError(name, headers, data)}
   {#if data.length === 0}
     <section>
       <Alert type="success">
