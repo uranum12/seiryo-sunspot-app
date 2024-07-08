@@ -104,18 +104,6 @@
   </section>
 {/await}
 
-{#if csvPromise}
-  {#await csvPromise}
-    <p>loading...</p>
-  {:catch e}
-    <section>
-      <Alert type="error">
-        <p>{e instanceof FetchError ? e.detail : e.message}</p>
-      </Alert>
-    </section>
-  {/await}
-{/if}
-
 {#if checkPromise && csvPromise}
   {#await Promise.all([checkPromise, csvPromise])}
     <p>loading...</p>
