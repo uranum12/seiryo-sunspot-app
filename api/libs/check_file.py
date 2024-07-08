@@ -12,18 +12,22 @@ _pat_date = (
     r"(?P<sep2>[-/\. ])"
     r"(?P<day>\d{1,2})"
 )
-_pat_left = r"(?P<left>\d{1,2}(?:\.\d+)?)"
-_pat_right = r"(?P<right>\d{1,2}(?:\.\d+)?)"
+_pat_lat_left = r"(?P<left>\d{1,2}(?:\.\d+)?)"
+_pat_lat_right = r"(?P<right>\d{1,2}(?:\.\d+)?)"
+_pat_lon_left = r"(?P<left>\d{1,3}(?:\.\d+)?)"
+_pat_lon_right = r"(?P<right>\d{1,3}(?:\.\d+)?)"
 _pat_lat_left_sign = r"(?P<left_sign>[nspm+-]?)"
 _pat_lat_right_sign = r"(?P<right_sign>[nspm+-]?)"
 _pat_lon_left_sign = r"(?P<left_sign>[ewpm+-]?)"
 _pat_lon_right_sign = r"(?P<right_sign>[ewpm+-]?)"
 _pat_lat = (
-    rf"{_pat_lat_left_sign}{_pat_left}(?:~{_pat_lat_right_sign}{_pat_right})?"
+    rf"{_pat_lat_left_sign}{_pat_lat_left}"
+    rf"(?:~{_pat_lat_right_sign}{_pat_lat_right})?"
 )
 _pat_lat = rf"{_pat_case}(?P<not_detected>ND|{_pat_lat})"
 _pat_lon = (
-    rf"{_pat_lon_left_sign}{_pat_left}(?:~{_pat_lon_right_sign}{_pat_right})?"
+    rf"{_pat_lon_left_sign}{_pat_lon_left}"
+    rf"(?:~{_pat_lon_right_sign}{_pat_lon_right})?"
 )
 _pat_lon = rf"{_pat_case}(?P<not_detected>ND|{_pat_lon})"
 _patterns = {
@@ -171,7 +175,7 @@ def validate_lon(s: str) -> bool:
         False
     """
     pattern = _patterns["lon"]
-    lon_max = 180
+    lon_max = 360
     if match := pattern.fullmatch(s):
         groups = match.groupdict()
         if groups["not_detected"].lower() == "nd":
