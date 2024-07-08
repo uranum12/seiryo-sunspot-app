@@ -2,6 +2,7 @@
   import Agg from "@/pages/agg/agg.svelte"
   import ButterflyAgg from "@/pages/butterfly/agg.svelte"
   import ButterflyDraw from "@/pages/butterfly/draw.svelte"
+  import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
   import ObservationsCalendar from "@/pages/observations/calendar.svelte"
@@ -25,7 +26,10 @@
     {
       path: "check",
       name: "Check",
-      children: [{ path: "file", name: "File", page: CheckFile }],
+      children: [
+        { path: "file", name: "File", page: CheckFile },
+        { path: "data", name: "Data", page: CheckData },
+      ],
     },
     {
       path: "sunspot_number",
