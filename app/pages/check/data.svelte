@@ -1,87 +1,21 @@
 <script lang="ts">
   import {
     getCheckDataGroupNumber,
-    getCheckDataLatRange,
-    getCheckDataLonRange,
     getCheckDataLatInterval,
+    getCheckDataLatRange,
     getCheckDataLonInterval,
+    getCheckDataLonRange,
   } from "@/api/check/data"
   import { getFiles } from "@/api/files"
   import Alert from "@/components/alert.svelte"
   import { FetchError } from "@/utils/fetch"
-
-  type GroupNumber = [string, number[], number[]]
-
-  function zipGroupNumber(
-    res: Awaited<ReturnType<typeof getCheckDataGroupNumber>>
-  ): GroupNumber[] {
-    const len = res.date.length
-    const result: GroupNumber[] = []
-    for (let i = 0; i < len; i++) {
-      result.push([res.date[i], res.original[i], res.expected[i]])
-    }
-    return result
-  }
-
-  type Range = [string, number, number, number]
-
-  function zipLatRange(
-    res: Awaited<ReturnType<typeof getCheckDataLatRange>>
-  ): Range[] {
-    const len = res.date.length
-    const result: Range[] = []
-    for (let i = 0; i < len; i++) {
-      result.push([res.date[i], res.no[i], res.latMin[i], res.latMax[i]])
-    }
-    return result
-  }
-
-  function zipLonRange(
-    res: Awaited<ReturnType<typeof getCheckDataLonRange>>
-  ): Range[] {
-    const len = res.date.length
-    const result: Range[] = []
-    for (let i = 0; i < len; i++) {
-      result.push([res.date[i], res.no[i], res.lonMin[i], res.lonMax[i]])
-    }
-    return result
-  }
-
-  type Interval = [string, number, number, number, number]
-
-  function zipLatInterval(
-    res: Awaited<ReturnType<typeof getCheckDataLatInterval>>
-  ): Interval[] {
-    const len = res.date.length
-    const result: Interval[] = []
-    for (let i = 0; i < len; i++) {
-      result.push([
-        res.date[i],
-        res.no[i],
-        res.latMin[i],
-        res.latMax[i],
-        res.interval[i],
-      ])
-    }
-    return result
-  }
-
-  function zipLonInterval(
-    res: Awaited<ReturnType<typeof getCheckDataLonInterval>>
-  ): Interval[] {
-    const len = res.date.length
-    const result: Interval[] = []
-    for (let i = 0; i < len; i++) {
-      result.push([
-        res.date[i],
-        res.no[i],
-        res.lonMin[i],
-        res.lonMax[i],
-        res.interval[i],
-      ])
-    }
-    return result
-  }
+  import {
+    zipGroupNumber,
+    zipLatInterval,
+    zipLatRange,
+    zipLonInterval,
+    zipLonRange,
+  } from "@/utils/zip_array"
 
   let input = $state<string>("")
   let latThreshold = $state<number>(50)
@@ -174,25 +108,42 @@
   </section>
 {/await}
 
-{#snippet table(headers, data)}
-  <table>
-    <thead>
-      <tr>
-        {#each headers as header}
-          <th>{header}</th>
-        {/each}
-      </tr>
-    </thead>
-    <tbody>
-      {#each data as row}
-        <tr>
-          {#each row as item}
-            <td>{item}</td>
+{#snippet showError(name: string, headers: string[], data: (string | number | number[])}
+  {#if data.length === 0}
+    <section>
+      <Alert type="success">
+        <p>No Error in {name}</p>
+      </Alert>
+    </section>
+  {:else}
+    <section class="space-y-1">
+      <Alert type="error">
+        <p>Error in {name}</p>
+      </Alert>
+      <table>
+        <thead>
+          <tr>
+            {#each headers as header}
+              <th>{header}</th>
+            {/each}
+          </tr>
+        </thead>
+        <tbody>
+          {#each data as row}
+            <tr>
+              {#each row as item}
+                {#if Array.isArray(item)}
+                  <td><code>{JSON.stringify(item)}</code></td>
+                {:else}
+                  <td>{item}</td>
+                {/if}
+              {/each}
+            </tr>
           {/each}
-        </tr>
-      {/each}
-    </tbody>
-  </table>
+        </tbody>
+      </table>
+    </section>
+  {/if}
 {/snippet}
 
 {#if checkPromisesAll}
@@ -206,91 +157,31 @@
       latIntervalData,
       lonIntervalData,
     ] = result}
-    {#if groupNumberData.date.length === 0}
-      <section>
-        <Alert type="success">
-          <p>No Error in group number</p>
-        </Alert>
-      </section>
-    {:else}
-      <section class="space-y-1">
-        <Alert type="error">
-          <p>Error in group number</p>
-        </Alert>
-        {@render table(
-          ["date", "original", "expected"],
-          zipGroupNumber(groupNumberData)
-        )}
-      </section>
-    {/if}
-    {#if latRangeData.date.length === 0}
-      <section>
-        <Alert type="success">
-          <p>No Error in latitude range</p>
-        </Alert>
-      </section>
-    {:else}
-      <section class="space-y-1">
-        <Alert type="error">
-          <p>Error in latitude range</p>
-        </Alert>
-        {@render table(
-          ["date", "no", "lat_min", "lat_max"],
-          zipLatRange(latRangeData)
-        )}
-      </section>
-    {/if}
-    {#if lonRangeData.date.length === 0}
-      <section>
-        <Alert type="success">
-          <p>No Error in longitude range</p>
-        </Alert>
-      </section>
-    {:else}
-      <section class="space-y-1">
-        <Alert type="error">
-          <p>Error in longitude range</p>
-        </Alert>
-        {@render table(
-          ["date", "no", "lon_min", "lon_max"],
-          zipLonRange(lonRangeData)
-        )}
-      </section>
-    {/if}
-    {#if latIntervalData.date.length === 0}
-      <section>
-        <Alert type="success">
-          <p>No Error in latitude interval</p>
-        </Alert>
-      </section>
-    {:else}
-      <section class="space-y-1">
-        <Alert type="error">
-          <p>Error in latitude interval</p>
-        </Alert>
-        {@render table(
-          ["date", "no", "lat_min", "lat_max", "interval"],
-          zipLatInterval(latIntervalData)
-        )}
-      </section>
-    {/if}
-    {#if lonIntervalData.date.length === 0}
-      <section>
-        <Alert type="success">
-          <p>No Error in longitude interval</p>
-        </Alert>
-      </section>
-    {:else}
-      <section class="space-y-1">
-        <Alert type="error">
-          <p>Error in longitude interval</p>
-        </Alert>
-        {@render table(
-          ["date", "no", "lon_min", "lon_max", "interval"],
-          zipLonInterval(lonIntervalData)
-        )}
-      </section>
-    {/if}
+    {@render showError(
+      "group number",
+      ["date", "original", "expected"],
+      zipGroupNumber(groupNumberData)
+    )}
+    {@render showError(
+      "latitude range",
+      ["date", "no", "lat_min", "lat_max"],
+      zipLatRange(latRangeData)
+    )}
+    {@render showError(
+      "longitude range",
+      ["date", "no", "lon_min", "lon_max"],
+      zipLonRange(lonRangeData)
+    )}
+    {@render showError(
+      "latitude interval",
+      ["date", "no", "lat_min", "lat_max", "interval"],
+      zipLatInterval(latIntervalData)
+    )}
+    {@render showError(
+      "longitude interval",
+      ["date", "no", "lon_min", "lon_max", "interval"],
+      zipLonInterval(lonIntervalData)
+    )}
   {:catch e}
     <section>
       <Alert type="error">
