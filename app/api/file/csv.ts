@@ -1,7 +1,7 @@
 import { get } from "@/utils/fetch"
 
 type FileCsvRes = {
-  data: string[][]
+  data: (string | null)[][]
 }
 
 type FileCsvParams = {

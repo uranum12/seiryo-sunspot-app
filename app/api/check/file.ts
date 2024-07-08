@@ -1,23 +1,23 @@
 import { get } from "@/utils/fetch"
 
-export type ErrorHeader = {
+type ErrorHeader = {
   type: "header"
   header: string[]
 }
 
-export type ErrorRow = {
+type ErrorRow = {
   type: "row"
   line: number
   over: string[]
 }
 
-export type ErrorField = {
+type ErrorField = {
   type: "field"
   line: number
   fields: string[]
 }
 
-export type CheckFileError = ErrorHeader | ErrorRow | ErrorField
+type CheckFileError = ErrorHeader | ErrorRow | ErrorField
 
 type CheckFileRes = {
   errors: CheckFileError[]
@@ -35,16 +35,4 @@ export async function getCheckFile(
     params,
   )
   return res.errors
-}
-
-export function isErrorHeader(error: CheckFileError): error is ErrorHeader {
-  return error.type === "header"
-}
-
-export function isErrorRow(error: CheckFileError): error is ErrorRow {
-  return error.type === "row"
-}
-
-export function isErrorField(error: CheckFileError): error is ErrorField {
-  return error.type === "field"
 }

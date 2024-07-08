@@ -1,74 +1,67 @@
 <script lang="ts">
-  import {
-    type CheckFileError,
-    getCheckFile,
-    isErrorField,
-    isErrorHeader,
-    isErrorRow,
-  } from "@/api/check/file"
+  import { getCheckFile } from "@/api/check/file"
   import { getFileCsv } from "@/api/file/csv"
   import { getFiles } from "@/api/files"
   import Accordion from "@/components/accordion.svelte"
   import Alert from "@/components/alert.svelte"
-  import Filter from "@/components/filter.svelte"
+  import FileSelect from "@/components/file_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
-  type ErrorPos = {
-    row: number
-    col: number[]
-  }
-
-  const correctHeader = ["date", "no", "lat", "lon", "num"]
-
-  let filter = $state<string>("")
-  let input = $state<string>("")
+  let selected = $state<string[]>([])
+  let inputs = $state<string[]>([])
 
   const getFilesCheck = () => {
     return getFiles({ path: "data", glob: "*.csv" })
   }
 
+  const getCsv = (i: number) => {
+    return getFileCsv({ input: inputs[i] })
+  }
+
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesCheck())
-  let checkPromise = $state<ReturnType<typeof getCheckFile>>()
-  let csvPromise = $state<ReturnType<typeof getFileCsv>>()
+  let checkPromises = $state<ReturnType<typeof getCheckFile>[]>([])
 
-  const submitDisabled = $derived(input.trim() === "")
-
-  const filterFiles = (files: string[]): string[] => {
-    return files
-      .filter((file) => file.replace(/^data\//, "").includes(filter))
-      .sort()
-  }
-
-  const calcErrorPos = (errors: CheckFileError[]): ErrorPos[] => {
-    return errors.filter(isErrorField).map((e) => ({
-      row: e.line - 1,
-      col: e.fields.map((i) => correctHeader.indexOf(i) + 1),
-    }))
-  }
-
-  const isItemError = (
-    item: string | null,
-    row: number,
-    col: number,
-    errors: CheckFileError[],
-    errorPos: ErrorPos[]
-  ) => {
-    return (
-      errorPos.some((e) => e.row === row && e.col.includes(col)) ||
-      (errors.filter(isErrorHeader).length && !row && col) ||
-      (item !== null && col > 5)
-    )
-  }
+  const submitDisabled = $derived(selected.length === 0)
 
   const fetchFiles = () => {
-    checkPromise = undefined
-    csvPromise = undefined
+    checkPromises = []
     filesPromise = getFilesCheck()
   }
 
   const submitCheck = () => {
-    checkPromise = getCheckFile({ input })
-    csvPromise = getFileCsv({ input })
+    inputs = selected
+    checkPromises = inputs.map((input) => getCheckFile({ input }))
+  }
+
+  const correctHeader = ["date", "no", "lat", "lon", "num"]
+
+  const calcErrorPos = (
+    errors: Awaited<ReturnType<typeof getCheckFile>>,
+    csv: Awaited<ReturnType<typeof getFileCsv>>
+  ) => {
+    const errPos: [number, number[]][] = []
+    for (const e of errors) {
+      if (e.type === "field") {
+        errPos.push([e.line - 1, e.fields.map((i) => correctHeader.indexOf(i))])
+      }
+    }
+    const result: [number, number][] = []
+    for (const i of errPos) {
+      for (const j of i[1]) {
+        result.push([i[0], j])
+      }
+    }
+    if (errors.filter((e) => e.type === "header").length) {
+      result.push([0, 0], [0, 1], [0, 2], [0, 3], [0, 4])
+    }
+    for (let i = 0; i < csv.length; i++) {
+      for (let j = 0; j < csv[i].length; j++) {
+        if (csv[i][j] !== null && j > 4) {
+          result.push([i, j])
+        }
+      }
+    }
+    return result
   }
 </script>
 
@@ -79,23 +72,18 @@
 {#await filesPromise}
   <p>loading...</p>
 {:then files}
-  {@const filtered = filterFiles(files)}
-  <section class="space-y-1">
-    <Filter bind:filter />
-    {#if filtered.length === 0}
-      <Alert type="warning">
-        <p>no files matched</p>
-      </Alert>
-    {:else}
-      <select required bind:value={input}>
-        <option value="" selected disabled>select file</option>
-        {#each filtered as file}
-          <option value={file}>{file.replace(/^data\//, "")}</option>
-        {/each}
-      </select>
+  {#if files.length !== 0}
+    <section class="space-y-1">
+      <FileSelect {files} bind:selected />
       <button disabled={submitDisabled} onclick={submitCheck}>submit</button>
-    {/if}
-  </section>
+    </section>
+  {:else}
+    <section>
+      <Alert type="warning">
+        <p>no files</p>
+      </Alert>
+    </section>
+  {/if}
 {:catch e}
   <section>
     <Alert type="error">
@@ -104,65 +92,73 @@
   </section>
 {/await}
 
-{#if checkPromise && csvPromise}
-  {#await Promise.all([checkPromise, csvPromise])}
+{#if checkPromises.length}
+  {#await Promise.all(checkPromises)}
     <p>loading...</p>
   {:then result}
-    {@const [errors, data] = result}
-    {#if errors.length === 0}
-      <section>
-        <Alert type="success">No Error found</Alert>
-      </section>
-    {:else}
-      {@const errorPos = calcErrorPos(errors)}
-      <section>
-        <Accordion summary="csv file">
-          <table>
-            <tbody>
-              {#each data as row, i}
-                <tr>
-                  {#each [`${i + 1}`].concat(row) as item, j}
-                    <td
-                      class="first:border-r-2"
-                      class:bg-gray-200={item === null}
-                      class:bg-red-200={isItemError(
-                        item,
-                        i,
-                        j,
-                        errors,
-                        errorPos
-                      )}
-                    >
-                      {item}
-                    </td>
+    {@const errorIndex = result
+      .map((e, i) => ({ e, i }))
+      .filter((i) => i.e.length)
+      .map((i) => i.i)}
+    {#if errorIndex.length}
+      {#each errorIndex as i}
+        <section class="space-y-1">
+          <p class="text-xl">Error in {inputs[i]}</p>
+          {#each result[i] as error}
+            <Alert type="error">
+              {#if error.type === "header"}
+                <p>
+                  invalid header : <code>{JSON.stringify(error.header)}</code>
+                </p>
+              {:else if error.type === "row"}
+                <p>
+                  line : {error.line}, over items :
+                  <code>{JSON.stringify(error.over)}</code>
+                </p>
+              {:else}
+                <p>
+                  line : {error.line}, fields :
+                  <code>{JSON.stringify(error.fields)}</code>
+                </p>
+              {/if}
+            </Alert>
+          {/each}
+          {#await getCsv(i) then csv}
+            {@const errPos = calcErrorPos(result[i], csv)}
+            {JSON.stringify(errPos)}
+            <Accordion summary="csv file">
+              <table>
+                <tbody>
+                  {#each csv as line, i}
+                    <tr>
+                      <td class="border-r-2">{i + 1}</td>
+                      {#each line as item, j}
+                        <td
+                          class:bg-gray-200={item === null}
+                          class:bg-red-200={errPos.some(
+                            (pos) => pos[0] === i && pos[1] === j
+                          )}
+                        >
+                          {item}
+                        </td>
+                      {/each}
+                    </tr>
                   {/each}
-                </tr>
-              {/each}
-            </tbody>
-          </table>
-        </Accordion>
-      </section>
-      <section class="space-y-1">
-        {#each errors as error}
-          <Alert type="error">
-            {#if isErrorHeader(error)}
-              <p>
-                invalid header :
-                <code>[{error.header.map((i) => `"${i}"`)}]</code>
-              </p>
-            {:else if isErrorRow(error)}
-              <p>
-                line : {error.line}, over items :
-                <code>[{error.over.map((i) => `"${i}"`)}]</code>
-              </p>
-            {:else if isErrorField(error)}
-              <p>
-                line : {error.line}, fields :
-                <code>[{error.fields.map((i) => `"${i}"`)}]</code>
-              </p>
-            {/if}
-          </Alert>
-        {/each}
+                </tbody>
+              </table>
+            </Accordion>
+          {:catch e}
+            <Alert type="error">
+              <p>{e instanceof FetchError ? e.detail : e.message}</p>
+            </Alert>
+          {/await}
+        </section>
+      {/each}
+    {:else}
+      <section>
+        <Alert type="success">
+          <p>No Error in all files</p>
+        </Alert>
       </section>
     {/if}
   {:catch e}
