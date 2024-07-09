@@ -12,6 +12,8 @@ matplotlib = "^3.9.0"
 python-dateutil = "^2.9.0"
 more-itertools = "^10.3.0"
 numpy = "^1.26.0"
+scipy = "^1.14.0"
+scikit-learn = "^1.5.1"
 
 [tool.poetry.group.dev.dependencies]
 invoke = "*"
@@ -22,6 +24,7 @@ types-python-dateutil = "*"
 [tool.poetry.group.test.dependencies]
 pytest = "*"
 pytest-cov = "*"
+pytest-mock = "^3.14.0"
 
 [tool.ruff]
 src = ["."]

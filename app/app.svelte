@@ -11,6 +11,8 @@
   import SunspotNumberAgg from "@/pages/sunspot_number/agg.svelte"
   import SunspotNumberHemispheric from "@/pages/sunspot_number/hemispheric.svelte"
   import SunspotNumberWholeDisk from "@/pages/sunspot_number/whole_disk.svelte"
+  import SunspotNumberWithSilsoAgg from "@/pages/sunspot_number/with_silso/agg.svelte"
+  import SunspotNumberWithSilsoDraw from "@/pages/sunspot_number/with_silso/with_silso.svelte"
   import { type Page, searchPage, searchPath } from "@/utils/pages"
 
   let currentPath = $state<string[]>([""])
@@ -47,6 +49,22 @@
           path: "hemispheric",
           name: "Hemispheric",
           page: SunspotNumberHemispheric,
+        },
+        {
+          path: "with_silso",
+          name: "With SILSO",
+          children: [
+            {
+              path: "agg",
+              name: "Agg",
+              page: SunspotNumberWithSilsoAgg,
+            },
+            {
+              path: "with_silso",
+              name: "With SILSO",
+              page: SunspotNumberWithSilsoDraw,
+            },
+          ],
         },
       ],
     },
