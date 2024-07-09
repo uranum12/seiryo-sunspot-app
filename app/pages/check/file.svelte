@@ -125,7 +125,6 @@
           {/each}
           {#await getCsv(i) then csv}
             {@const errPos = calcErrorPos(result[i], csv)}
-            {JSON.stringify(errPos)}
             <Accordion summary="csv file">
               <table>
                 <tbody>
