@@ -77,16 +77,24 @@
 {#await filesPromise}
   <p>loading...</p>
 {:then files}
-  <section class="space-y-1">
-    <select required bind:value={filename}>
-      <option value="" selected disabled>select file</option>
-      {#each files.sort() as file}
-        <option value={file}>{file.replace(/^out\//, "")}</option>
-      {/each}
-    </select>
-    <DateSelect bind:date required dayHidden />
-    <button disabled={submitDisabled} onclick={submitCalendar}>submit</button>
-  </section>
+  {#if files.length !== 0}
+    <section class="space-y-1">
+      <select required bind:value={filename}>
+        <option value="" selected disabled>select file</option>
+        {#each files.sort() as file}
+          <option value={file}>{file.replace(/^out\//, "")}</option>
+        {/each}
+      </select>
+      <DateSelect bind:date required dayHidden />
+      <button disabled={submitDisabled} onclick={submitCalendar}>submit</button>
+    </section>
+  {:else}
+    <section>
+      <Alert type="warning">
+        <p>no files</p>
+      </Alert>
+    </section>
+  {/if}
 {:catch e}
   <section>
     <Alert type="error">

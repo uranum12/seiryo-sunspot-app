@@ -91,15 +91,23 @@
 {#await filesPromise}
   <p>loading...</p>
 {:then files}
-  <section class="space-y-1">
-    <select required bind:value={input}>
-      <option value="" selected disabled>select file</option>
-      {#each files as file}
-        <option value={file}>{file.replace(/^data\//, "")}</option>
-      {/each}
-    </select>
-    <button disabled={submitDisabled} onclick={submitCheck}>submit</button>
-  </section>
+  {#if files.length !== 0}
+    <section class="space-y-1">
+      <select required bind:value={input}>
+        <option value="" selected disabled>select file</option>
+        {#each files as file}
+          <option value={file}>{file.replace(/^data\//, "")}</option>
+        {/each}
+      </select>
+      <button disabled={submitDisabled} onclick={submitCheck}>submit</button>
+    </section>
+  {:else}
+    <section>
+      <Alert type="warning">
+        <p>no files</p>
+      </Alert>
+    </section>
+  {/if}
 {:catch e}
   <section>
     <Alert type="error">
