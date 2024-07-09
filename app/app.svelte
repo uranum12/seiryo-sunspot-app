@@ -4,6 +4,7 @@
   import ButterflyDraw from "@/pages/butterfly/draw.svelte"
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
+  import CheckFinder from "@/pages/check/finder.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
   import ObservationsCalendar from "@/pages/observations/calendar.svelte"
   import ObservationsMonthly from "@/pages/observations/monthly.svelte"
@@ -29,6 +30,7 @@
       children: [
         { path: "file", name: "File", page: CheckFile },
         { path: "data", name: "Data", page: CheckData },
+        { path: "finder", name: "Finder", page: CheckFinder },
       ],
     },
     {

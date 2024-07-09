@@ -5,7 +5,7 @@ import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from api.libs import check_data, check_file
+from api.libs import check_data, check_file, finder
 
 
 class CheckFileErrorHeader(BaseModel):
@@ -97,6 +97,16 @@ class CheckDataLonIntervalRes(BaseModel):
     lon_min: list[int]
     lon_max: list[int]
     interval: list[int]
+
+
+class FinderQuery(BaseModel):
+    year: int
+    month: int
+    day: int
+
+
+class FinderRes(BaseModel):
+    result: list[finder.FinderResult]
 
 
 router = APIRouter(prefix="/check", tags=["check"])
@@ -243,3 +253,10 @@ def invalid_lon_interval(
         lon_max=data["lon_max"],
         interval=data["interval"],
     )
+
+
+@router.get("/finder", response_model=FinderRes)
+def check_finder(query: FinderQuery = Depends()) -> FinderRes:
+    search_path = Path("data")
+    result = finder.finder(search_path, query.year, query.month, query.day)
+    return FinderRes(result=result)
