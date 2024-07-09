@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 from api.libs import sunspot_number_with_silso, utils
 from api.libs.sunspot_number_with_silso_config import (
+    SunspotNumberRatio,
     SunspotNumberScatter,
     SunspotNumberWithSilso,
 )
@@ -215,6 +216,83 @@ def save_scatter(body: draw.SaveBody) -> draw.SaveRes:
         factor = json_data["factor"]
         r2 = json_data["r2"]
     fig = sunspot_number_with_silso.draw_scatter(df, factor, r2, config)
+    fig.savefig(
+        output_path,
+        format=body.format,
+        dpi=body.dpi,
+        bbox_inches="tight",
+        pad_inches=0.1,
+    )
+    return draw.SaveRes(output=str(output_path))
+
+
+@router.get("/draw/ratio", response_model=draw.PreviewRes)
+def draw_ratio(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
+    ratio_diff_path = Path(query.filename).with_name("ratio_diff.parquet")
+    if not ratio_diff_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {ratio_diff_path} not found"
+        )
+    factor_r2_path = Path(query.filename).with_name("factor_r2.json")
+    if not factor_r2_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {factor_r2_path} not found"
+        )
+    config_path = Path(query.config_name)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
+    try:
+        with config_path.open("r") as f_config:
+            config = SunspotNumberRatio(**json.load(f_config))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
+    df = pl.read_parquet(ratio_diff_path)
+    with factor_r2_path.open("r") as f_factor_r2:
+        json_data = json.load(f_factor_r2)
+        factor = json_data["factor"]
+    fig = sunspot_number_with_silso.draw_ratio(df, factor, config)
+    img = utils.fig_to_base64(fig)
+    return draw.PreviewRes(img=img)
+
+
+@router.post("/draw/ratio", response_model=draw.SaveRes)
+def save_ratio(body: draw.SaveBody) -> draw.SaveRes:
+    ratio_diff_path = Path(body.input).with_name("ratio_diff.parquet")
+    if not ratio_diff_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {ratio_diff_path} not found"
+        )
+    factor_r2_path = Path(body.input).with_name("factor_r2.json")
+    if not factor_r2_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {factor_r2_path} not found"
+        )
+    config_path = Path(body.config)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
+    output_path = ratio_diff_path.with_name(f"ratio.{body.format}")
+    if not body.overwrite and output_path.exists():
+        raise HTTPException(
+            status_code=400, detail=f"file {output_path} already exists"
+        )
+    try:
+        with config_path.open("r") as f_config:
+            config = SunspotNumberRatio(**json.load(f_config))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
+    df = pl.read_parquet(ratio_diff_path)
+    with factor_r2_path.open("r") as f_factor_r2:
+        json_data = json.load(f_factor_r2)
+        factor = json_data["factor"]
+    fig = sunspot_number_with_silso.draw_ratio(df, factor, config)
     fig.savefig(
         output_path,
         format=body.format,
