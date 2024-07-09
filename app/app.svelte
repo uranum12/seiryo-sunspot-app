@@ -14,6 +14,7 @@
   import SunspotNumberWithSilsoAgg from "@/pages/sunspot_number/with_silso/agg.svelte"
   import SunspotNumberWithSilsoDiff from "@/pages/sunspot_number/with_silso/diff.svelte"
   import SunspotNumberWithSilsoRatio from "@/pages/sunspot_number/with_silso/ratio.svelte"
+  import SunspotNumberWithSilsoRatioDiff1 from "@/pages/sunspot_number/with_silso/ratio_diff_1.svelte"
   import SunspotNumberWithSilsoScatter from "@/pages/sunspot_number/with_silso/scatter.svelte"
   import SunspotNumberWithSilsoDraw from "@/pages/sunspot_number/with_silso/with_silso.svelte"
   import { type Page, searchPage, searchPath } from "@/utils/pages"
@@ -81,6 +82,11 @@
               path: "diff",
               name: "Diff",
               page: SunspotNumberWithSilsoDiff,
+            },
+            {
+              path: "ratio_diff_1",
+              name: "Ratio and Difference 1",
+              page: SunspotNumberWithSilsoRatioDiff1,
             },
           ],
         },
