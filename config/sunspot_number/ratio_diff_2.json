@@ -1,0 +1,51 @@
+{
+  "fig_size": { "width": 8.0, "height": 5.0 },
+  "line_ratio": {
+    "label": "ratio",
+    "style": "-",
+    "width": 1.0,
+    "color": "C0",
+    "marker": { "marker": "o", "size": 3.0 }
+  },
+  "line_diff": {
+    "label": "diff",
+    "style": "-",
+    "width": 1.0,
+    "color": "C1",
+    "marker": { "marker": "o", "size": 3.0 }
+  },
+  "title": {
+    "text": "ratio: seiryo / SILSO and difference: seiryo* - SILSO",
+    "font_family": "Times New Roman",
+    "font_size": 16,
+    "position": 1.1
+  },
+  "xaxis": {
+    "title": {
+      "text": "date",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  },
+  "yaxis_ratio": {
+    "title": {
+      "text": "ratio",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  },
+  "yaxis_diff": {
+    "title": {
+      "text": "difference",
+      "font_family": "Times New Roman",
+      "font_size": 16,
+      "position": 1.0
+    },
+    "ticks": { "font_family": "Times New Roman", "font_size": 12 }
+  },
+  "legend": { "font_family": "Times New Roman", "font_size": 12 }
+}

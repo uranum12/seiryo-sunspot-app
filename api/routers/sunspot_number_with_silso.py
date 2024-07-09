@@ -10,6 +10,7 @@ from api.libs.sunspot_number_with_silso_config import (
     SunspotNumberDiff,
     SunspotNumberRatio,
     SunspotNumberRatioDiff1,
+    SunspotNumberRatioDiff2,
     SunspotNumberScatter,
     SunspotNumberWithSilso,
 )
@@ -433,6 +434,67 @@ def save_ratio_diff_1(body: draw.SaveBody) -> draw.SaveRes:
         json_data = json.load(f_factor_r2)
         factor = json_data["factor"]
     fig = sunspot_number_with_silso.draw_ratio_diff_1(df, factor, config)
+    fig.savefig(
+        output_path,
+        format=body.format,
+        dpi=body.dpi,
+        bbox_inches="tight",
+        pad_inches=0.1,
+    )
+    return draw.SaveRes(output=str(output_path))
+
+
+@router.get("/draw/ratio_diff_2", response_model=draw.PreviewRes)
+def draw_ratio_diff_2(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
+    input_path = Path(query.filename)
+    if not input_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {input_path} not found"
+        )
+    config_path = Path(query.config_name)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
+    try:
+        with config_path.open("r") as f_config:
+            config = SunspotNumberRatioDiff2(**json.load(f_config))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
+    df = pl.read_parquet(input_path)
+    fig = sunspot_number_with_silso.draw_ratio_diff_2(df, config)
+    img = utils.fig_to_base64(fig)
+    return draw.PreviewRes(img=img)
+
+
+@router.post("/draw/ratio_diff_2", response_model=draw.SaveRes)
+def save_ratio_diff_2(body: draw.SaveBody) -> draw.SaveRes:
+    input_path = Path(body.input)
+    if not input_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {input_path} not found"
+        )
+    config_path = Path(body.config)
+    if not config_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"config {config_path} not found"
+        )
+    output_path = input_path.with_name(f"ratio_diff_2.{body.format}")
+    if not body.overwrite and output_path.exists():
+        raise HTTPException(
+            status_code=400, detail=f"file {output_path} already exists"
+        )
+    try:
+        with config_path.open("r") as f:
+            config = SunspotNumberRatioDiff2(**json.load(f))
+    except ValueError as e:
+        raise HTTPException(
+            status_code=400, detail=f"config {config_path} is broken"
+        ) from e
+    df = pl.read_parquet(input_path)
+    fig = sunspot_number_with_silso.draw_ratio_diff_2(df, config)
     fig.savefig(
         output_path,
         format=body.format,
