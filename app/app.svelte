@@ -12,6 +12,7 @@
   import SunspotNumberHemispheric from "@/pages/sunspot_number/hemispheric.svelte"
   import SunspotNumberWholeDisk from "@/pages/sunspot_number/whole_disk.svelte"
   import SunspotNumberWithSilsoAgg from "@/pages/sunspot_number/with_silso/agg.svelte"
+  import SunspotNumberWithSilsoScatter from "@/pages/sunspot_number/with_silso/scatter.svelte"
   import SunspotNumberWithSilsoDraw from "@/pages/sunspot_number/with_silso/with_silso.svelte"
   import { type Page, searchPage, searchPath } from "@/utils/pages"
 
@@ -63,6 +64,11 @@
               path: "with_silso",
               name: "With SILSO",
               page: SunspotNumberWithSilsoDraw,
+            },
+            {
+              path: "scatter",
+              name: "Scatter",
+              page: SunspotNumberWithSilsoScatter,
             },
           ],
         },
