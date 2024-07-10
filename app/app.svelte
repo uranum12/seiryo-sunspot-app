@@ -11,6 +11,11 @@
   import SunspotNumberAgg from "@/pages/sunspot_number/agg.svelte"
   import SunspotNumberHemispheric from "@/pages/sunspot_number/hemispheric.svelte"
   import SunspotNumberWholeDisk from "@/pages/sunspot_number/whole_disk.svelte"
+  import SunspotNumberWithFlareAgg from "@/pages/sunspot_number/with_flare/agg.svelte"
+  import SunspotNumberWithFlareHemispheric from "@/pages/sunspot_number/with_flare/hemispheric.svelte"
+  import SunspotNumberWithFlareHemisphericWithFactors from "@/pages/sunspot_number/with_flare/hemispheric_with_factors.svelte"
+  import SunspotNumberWithFlareDraw from "@/pages/sunspot_number/with_flare/with_flare.svelte"
+  import SunspotNumberWithFlareDrawWithFactor from "@/pages/sunspot_number/with_flare/with_flare_with_factor.svelte"
   import SunspotNumberWithSilsoAgg from "@/pages/sunspot_number/with_silso/agg.svelte"
   import SunspotNumberWithSilsoDiff from "@/pages/sunspot_number/with_silso/diff.svelte"
   import SunspotNumberWithSilsoRatio from "@/pages/sunspot_number/with_silso/ratio.svelte"
@@ -93,6 +98,37 @@
               path: "ratio_diff_2",
               name: "Ratio and Difference 2",
               page: SunspotNumberWithSilsoRatioDiff2,
+            },
+          ],
+        },
+        {
+          path: "with_flare",
+          name: "With Flare Index",
+          children: [
+            {
+              path: "agg",
+              name: "Agg",
+              page: SunspotNumberWithFlareAgg,
+            },
+            {
+              path: "with_flare",
+              name: "With Flare Index",
+              page: SunspotNumberWithFlareDraw,
+            },
+            {
+              path: "with_flare_with_factor",
+              name: "With Flare Index with factor",
+              page: SunspotNumberWithFlareDrawWithFactor,
+            },
+            {
+              path: "hemispheric",
+              name: "Hemispheric",
+              page: SunspotNumberWithFlareHemispheric,
+            },
+            {
+              path: "hemispheric_with_factors",
+              name: "Hemispheric with factors",
+              page: SunspotNumberWithFlareHemisphericWithFactors,
             },
           ],
         },
