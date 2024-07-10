@@ -126,7 +126,7 @@
 <header class="mb-4 px-8">
   <nav class="space-y-1">
     {#each paths as navs}
-      <div class="flex space-x-2 overflow-x-auto">
+      <div class="scrollbar-none flex space-x-2 overflow-x-auto">
         {#each navs as nav}
           <a
             href={nav.path}
