@@ -15,7 +15,7 @@
   input:not([type]),
   input[type="text"],
   input[type="number"] {
-    @apply w-full rounded border border-gray-300 p-2 outline-none;
+    @apply w-full appearance-none rounded border border-gray-300 bg-transparent p-2 outline-none;
     @apply invalid:border-red-300 focus:border-blue-500 focus:invalid:border-red-500;
   }
   label:has(input[type="checkbox"]) {
