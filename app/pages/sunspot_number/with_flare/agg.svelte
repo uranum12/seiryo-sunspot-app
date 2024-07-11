@@ -85,29 +85,17 @@
     </section>
   {:else}
     <section class="space-y-1">
-      <select required bind:value={seiryoPath}>
-        <option value="" selected disabled>select file for seiryo</option>
-        {#each filesSeiryo.sort() as file}
-          <option value={file}>{file}</option>
-        {/each}
-      </select>
       <div>
-        <div class="flex gap-2 px-2">
-          <button
-            class="rounded-b-none border-b-0 border-gray-300"
-            class:border-blue-300={tabNumber === 0}
-            onclick={() => (tabNumber = 0)}>North</button
-          >
-          <button
-            class="rounded-b-none border-b-0 border-gray-300"
-            class:border-blue-300={tabNumber === 1}
-            onclick={() => (tabNumber = 1)}>South</button
-          >
-          <button
-            class="rounded-b-none border-b-0 border-gray-300"
-            class:border-blue-300={tabNumber === 2}
-            onclick={() => (tabNumber = 2)}>Total</button
-          >
+        <div class="flex gap-x-2 px-2">
+          {#each ["North", "South", "Total"] as title, i}
+            <button
+              class="rounded-b-none border-2 border-b-0 border-gray-300"
+              class:border-blue-300={tabNumber === i}
+              onclick={() => (tabNumber = i)}
+            >
+              {title}
+            </button>
+          {/each}
         </div>
         <div class="rounded border border-gray-300 p-2">
           <div class:hidden={tabNumber !== 0}>
@@ -121,6 +109,12 @@
           </div>
         </div>
       </div>
+      <select required bind:value={seiryoPath}>
+        <option value="" selected disabled>select file for seiryo</option>
+        {#each filesSeiryo.sort() as file}
+          <option value={file}>{file}</option>
+        {/each}
+      </select>
       <input placeholder="output file name" required bind:value={outputName} />
       <label>
         <input type="checkbox" bind:checked={overwrite} />
