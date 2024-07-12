@@ -1,13 +1,19 @@
 <script lang="ts">
-  import { postAgg } from "@/api/butterfly/agg"
+  import { postTrim } from "@/api/butterfly/trim"
   import { getFiles } from "@/api/files"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
+  import DateSelect from "@/components/date_select.svelte"
   import { FetchError } from "@/utils/fetch"
 
   let inputName = $state<string>("")
   let outputName = $state<string>("")
   let overwrite = $state<boolean>(false)
+
+  let latMin = $state<number>()
+  let latMax = $state<number>()
+  let dateStart = $state<string>()
+  let dateEnd = $state<string>()
 
   let showConfirmOverwrite = $state<boolean>(false)
 
@@ -15,23 +21,27 @@
     inputName.trim() === "" || outputName.trim() === ""
   )
 
-  const getFilesAgg = () => {
-    return getFiles({ path: "out", glob: "*.parquet" })
+  const getFilesTrim = () => {
+    return getFiles({ path: "out/butterfly", glob: "*.parquet" })
   }
 
-  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesAgg())
-  let aggPromise = $state<ReturnType<typeof postAgg>>()
+  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesTrim())
+  let trimPromise = $state<ReturnType<typeof postTrim>>()
 
   const fetchFiles = () => {
-    aggPromise = undefined
-    filesPromise = getFilesAgg()
+    trimPromise = undefined
+    filesPromise = getFilesTrim()
   }
 
-  const submitAgg = () => {
-    aggPromise = postAgg({
+  const submitTrim = () => {
+    trimPromise = postTrim({
       inputName,
       outputName,
       overwrite,
+      latMin,
+      latMax,
+      dateStart,
+      dateEnd,
     })
   }
 
@@ -39,7 +49,7 @@
     if (overwrite) {
       showConfirmOverwrite = true
     } else {
-      submitAgg()
+      submitTrim()
     }
   }
 </script>
@@ -60,14 +70,32 @@
         {/each}
       </select>
       <input placeholder="output file name" required bind:value={outputName} />
-      <label>
-        <input type="checkbox" bind:checked={overwrite} />
-        <span>Overwrite</span>
-      </label>
-      <button disabled={submitDisabled} onclick={clickSubmit}>submit</button>
+      <div class="space-y-1">
+        <input
+          type="number"
+          placeholder="latitude min value"
+          min="-90"
+          max="90"
+          bind:value={latMin}
+        />
+        <input
+          type="number"
+          placeholder="latitude max value"
+          min="-90"
+          max="90"
+          bind:value={latMax}
+        />
+        <DateSelect bind:date={dateStart} />
+        <DateSelect bind:date={dateEnd} />
+        <label>
+          <input type="checkbox" bind:checked={overwrite} />
+          <span>Overwrite</span>
+        </label>
+        <button disabled={submitDisabled} onclick={clickSubmit}>submit</button>
+      </div>
     </section>
 
-    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitAgg}>
+    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitTrim}>
       Are you sure you want me to overwrite file ?
     </ConfirmDialog>
   {:else}
@@ -85,8 +113,8 @@
   </section>
 {/await}
 
-{#if aggPromise}
-  {#await aggPromise}
+{#if trimPromise}
+  {#await trimPromise}
     <p>loading...</p>
   {:then output}
     <section>

@@ -7,7 +7,7 @@
   const imageAlt = "butterfly diagram"
 
   const getFilesDraw = () => {
-    return getFiles({ path: "out/butterfly", glob: "**/*.npz" })
+    return getFiles({ path: "out/butterfly", glob: "*.npz" })
   }
 
   const getFilesConfig = () => {

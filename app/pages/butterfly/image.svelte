@@ -1,45 +1,38 @@
 <script lang="ts">
-  import { postAgg } from "@/api/butterfly/agg"
+  import { postImage } from "@/api/butterfly/image"
   import { getFiles } from "@/api/files"
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import { FetchError } from "@/utils/fetch"
 
   let inputName = $state<string>("")
-  let outputName = $state<string>("")
   let overwrite = $state<boolean>(false)
 
   let showConfirmOverwrite = $state<boolean>(false)
 
-  const submitDisabled = $derived<boolean>(
-    inputName.trim() === "" || outputName.trim() === ""
-  )
+  const submitDisabled = $derived<boolean>(inputName.trim() === "")
 
-  const getFilesAgg = () => {
-    return getFiles({ path: "out", glob: "*.parquet" })
+  const getFilesImage = () => {
+    return getFiles({ path: "out/butterfly", glob: "*.parquet" })
   }
 
-  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesAgg())
-  let aggPromise = $state<ReturnType<typeof postAgg>>()
+  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesImage())
+  let imagePromise = $state<ReturnType<typeof postImage>>()
 
   const fetchFiles = () => {
-    aggPromise = undefined
-    filesPromise = getFilesAgg()
+    imagePromise = undefined
+    filesPromise = getFilesImage()
   }
 
-  const submitAgg = () => {
-    aggPromise = postAgg({
-      inputName,
-      outputName,
-      overwrite,
-    })
+  const submitImage = () => {
+    imagePromise = postImage({ inputName, overwrite })
   }
 
   const clickSubmit = () => {
     if (overwrite) {
       showConfirmOverwrite = true
     } else {
-      submitAgg()
+      submitImage()
     }
   }
 </script>
@@ -59,7 +52,6 @@
           <option value={file}>{file.replace(/^out\//, "")}</option>
         {/each}
       </select>
-      <input placeholder="output file name" required bind:value={outputName} />
       <label>
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
@@ -67,7 +59,7 @@
       <button disabled={submitDisabled} onclick={clickSubmit}>submit</button>
     </section>
 
-    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitAgg}>
+    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitImage}>
       Are you sure you want me to overwrite file ?
     </ConfirmDialog>
   {:else}
@@ -85,14 +77,13 @@
   </section>
 {/await}
 
-{#if aggPromise}
-  {#await aggPromise}
+{#if imagePromise}
+  {#await imagePromise}
     <p>loading...</p>
   {:then output}
     <section>
       <Alert type="success">
-        <p>file {output.outputData} generated</p>
-        <p>file {output.outputInfo} generated</p>
+        <p>file {output} generated</p>
       </Alert>
     </section>
   {:catch e}

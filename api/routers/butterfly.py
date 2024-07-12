@@ -7,7 +7,13 @@ import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
-from api.libs import butterfly, utils
+from api.libs import (
+    butterfly,
+    butterfly_draw,
+    butterfly_image,
+    butterfly_trim,
+    utils,
+)
 from api.libs.butterfly_config import ButterflyDiagram
 from api.models import draw
 
@@ -17,17 +23,34 @@ class ButterflyAgg(BaseModel):
     output_name: str
     overwrite: bool = False
 
-    lat_min: int = -50
-    lat_max: int = 50
-    date_start: str | None = None
-    date_end: str | None = None
-    date_interval: str | None = None
-
 
 class ButterflyAggRes(BaseModel):
     output_data: str
-    output_image: str
     output_info: str
+
+
+class ButterflyTrim(BaseModel):
+    input_name: str
+    output_name: str
+    overwrite: bool = False
+    lat_min: int | None = None
+    lat_max: int | None = None
+    date_start: str | None = None
+    date_end: str | None = None
+
+
+class ButterflyTrimRes(BaseModel):
+    output_data: str
+    output_info: str
+
+
+class ButterflyImage(BaseModel):
+    input_name: str
+    overwrite: bool = False
+
+
+class ButterflyImageRes(BaseModel):
+    output_image: str
 
 
 router = APIRouter(prefix="/butterfly", tags=["butterfly"])
@@ -40,11 +63,10 @@ def butterfly_agg(body: ButterflyAgg) -> ButterflyAggRes:
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    output_dir = Path("out/butterfly") / input_path.stem
+    output_dir = Path("out/butterfly")
     output_dir.mkdir(exist_ok=True, parents=True)
     output_paths = {
         "data": output_dir / f"{body.output_name}.parquet",
-        "img": output_dir / f"{body.output_name}.npz",
         "info": output_dir / f"{body.output_name}.json",
     }
     for path in output_paths.values():
@@ -54,22 +76,9 @@ def butterfly_agg(body: ButterflyAgg) -> ButterflyAggRes:
             )
     data = pl.scan_parquet(input_path)
     start, end = butterfly.adjust_dates(*butterfly.calc_date_limit(data))
-    date_start = (
-        start
-        if body.date_start is None
-        else date.fromisoformat(body.date_start)
-    )
-    date_end = (
-        end if body.date_end is None else date.fromisoformat(body.date_end)
-    )
-    date_interval = "P1M" if body.date_interval is None else body.date_interval
     try:
         info = butterfly.ButterflyInfo(
-            body.lat_min,
-            body.lat_max,
-            date_start,
-            date_end,
-            butterfly.DateDelta.fromisoformat(date_interval),
+            -90, 90, start, end, butterfly.DateDelta(months=1)
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e)) from e
@@ -77,18 +86,92 @@ def butterfly_agg(body: ButterflyAgg) -> ButterflyAggRes:
         f_info.write(info.to_json())
     df = butterfly.calc_lat(data, info)
     df.write_parquet(output_paths["data"])
-    img = butterfly.create_image(df, info)
-    with (output_paths["img"]).open("wb") as f_img:
-        np.savez_compressed(f_img, img=img)
     return ButterflyAggRes(
         output_data=str(output_paths["data"]),
-        output_image=str(output_paths["img"]),
         output_info=str(output_paths["info"]),
     )
 
 
+@router.post("/trim", response_model=ButterflyTrimRes)
+def trim_butterfly(body: ButterflyTrim) -> ButterflyTrimRes:
+    data_path = Path(body.input_name).with_suffix(".parquet")
+    if not data_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {data_path} not found"
+        )
+    info_path = data_path.with_suffix(".json")
+    if not info_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {info_path} not found"
+        )
+    output_dir = Path("out/butterfly")
+    output_dir.mkdir(exist_ok=True, parents=True)
+    output_paths = {
+        "data": output_dir / f"{body.output_name}.parquet",
+        "info": output_dir / f"{body.output_name}.json",
+    }
+    for path in output_paths.values():
+        if not body.overwrite and path.exists():
+            raise HTTPException(
+                status_code=400, detail=f"file {path} already exists"
+            )
+    date_start = (
+        date.fromisoformat(body.date_start)
+        if body.date_start is not None
+        else None
+    )
+    date_end = (
+        date.fromisoformat(body.date_end)
+        if body.date_end is not None
+        else None
+    )
+    data = pl.read_parquet(data_path)
+    with info_path.open("r") as f_info:
+        info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
+    try:
+        trimmed_info = butterfly_trim.trim_info(
+            info, body.lat_min, body.lat_max, date_start, date_end
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    with (output_paths["info"]).open("w") as f_info:
+        f_info.write(trimmed_info.to_json())
+    trimmed_data = butterfly_trim.trim_data(data, trimmed_info)
+    trimmed_data.write_parquet(output_paths["data"])
+    return ButterflyTrimRes(
+        output_data=str(output_paths["data"]),
+        output_info=str(output_paths["info"]),
+    )
+
+
+@router.post("/image", response_model=ButterflyImageRes)
+def butterfly_img(body: ButterflyImage) -> ButterflyImageRes:
+    data_path = Path(body.input_name).with_suffix(".parquet")
+    if not data_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {data_path} not found"
+        )
+    info_path = data_path.with_suffix(".json")
+    if not info_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {info_path} not found"
+        )
+    output_path = Path("out/butterfly") / f"{data_path.stem}.npz"
+    if not body.overwrite and output_path.exists():
+        raise HTTPException(
+            status_code=400, detail=f"file {output_path} already exists"
+        )
+    df = pl.read_parquet(data_path)
+    with info_path.open("r") as f_info:
+        info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
+    img = butterfly_image.create_image(df, info)
+    with output_path.open("wb") as f_img:
+        np.savez_compressed(f_img, img=img)
+    return ButterflyImageRes(output_image=str(output_path))
+
+
 @router.get("/draw/butterfly", response_model=draw.PreviewRes)
-def butterfly_draw(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
+def draw_butterfly(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
     input_path = Path(query.filename)
     if not input_path.exists():
         raise HTTPException(
@@ -110,13 +193,13 @@ def butterfly_draw(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
         img = f_img["img"]
     with input_path.with_suffix(".json").open("r") as f_info:
         info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
-    fig = butterfly.draw_butterfly_diagram(img, info, config)
+    fig = butterfly_draw.draw_butterfly_diagram(img, info, config)
     img = utils.fig_to_base64(fig)
     return draw.PreviewRes(img=img)
 
 
 @router.post("/draw/butterfly", response_model=draw.SaveRes)
-def butterfly_save(body: draw.SaveBody) -> draw.SaveRes:
+def save_butterfly(body: draw.SaveBody) -> draw.SaveRes:
     input_path = Path(body.input)
     if not input_path.exists():
         raise HTTPException(
@@ -143,7 +226,7 @@ def butterfly_save(body: draw.SaveBody) -> draw.SaveRes:
         img = f_img["img"]
     with input_path.with_suffix(".json").open("r") as f_info:
         info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
-    fig = butterfly.draw_butterfly_diagram(img, info, config)
+    fig = butterfly_draw.draw_butterfly_diagram(img, info, config)
     fig.savefig(
         output_path,
         format=body.format,
