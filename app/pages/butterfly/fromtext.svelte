@@ -2,10 +2,10 @@
   import { getFiles } from "@/api/files"
   import AggCommon from "@/pages/butterfly/agg_common.svelte"
 
-  const postUrl = "/api/butterfly/agg"
+  const postUrl = "/api/butterfly/fromtext"
 
   const getFilesAgg = () => {
-    return getFiles({ path: "out", glob: "*.parquet" })
+    return getFiles({ path: "data", glob: "*.txt" })
   }
 </script>
 

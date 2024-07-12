@@ -2,6 +2,7 @@
   import Agg from "@/pages/agg/agg.svelte"
   import ButterflyAgg from "@/pages/butterfly/agg.svelte"
   import ButterflyDraw from "@/pages/butterfly/draw.svelte"
+  import ButterflyFromtext from "@/pages/butterfly/fromtext.svelte"
   import ButterflyImage from "@/pages/butterfly/image.svelte"
   import ButterflyTrim from "@/pages/butterfly/trim.svelte"
   import CheckData from "@/pages/check/data.svelte"
@@ -150,6 +151,11 @@
       name: "Butterfly Diagram",
       children: [
         { path: "agg", name: "Agg", page: ButterflyAgg },
+        {
+          path: "fromtext",
+          name: "From old text file",
+          page: ButterflyFromtext,
+        },
         { path: "trim", name: "Trim", page: ButterflyTrim },
         { path: "image", name: "Image", page: ButterflyImage },
         { path: "draw", name: "Draw", page: ButterflyDraw },

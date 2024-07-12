@@ -11,6 +11,6 @@ type AggBody = {
   overwrite: boolean
 }
 
-export async function postAgg(body: AggBody): Promise<AggRes> {
-  return await post<AggRes, AggBody>("/api/butterfly/agg", body)
+export async function postAgg(url: string, body: AggBody): Promise<AggRes> {
+  return await post<AggRes, AggBody>(url, body)
 }

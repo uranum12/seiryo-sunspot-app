@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from api.libs import (
     butterfly,
     butterfly_draw,
+    butterfly_fromtext,
     butterfly_image,
     butterfly_trim,
     utils,
@@ -85,6 +86,42 @@ def butterfly_agg(body: ButterflyAgg) -> ButterflyAggRes:
     with (output_paths["info"]).open("w") as f_info:
         f_info.write(info.to_json())
     df = butterfly.calc_lat(data, info)
+    df.write_parquet(output_paths["data"])
+    return ButterflyAggRes(
+        output_data=str(output_paths["data"]),
+        output_info=str(output_paths["info"]),
+    )
+
+
+@router.post("/fromtext", response_model=ButterflyAggRes)
+def fromtext(body: ButterflyAgg) -> ButterflyAggRes:
+    input_path = Path(body.input_name)
+    if not input_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {input_path} not found"
+        )
+    output_dir = Path("out/butterfly")
+    output_dir.mkdir(exist_ok=True, parents=True)
+    output_paths = {
+        "data": output_dir / f"{body.output_name}.parquet",
+        "info": output_dir / f"{body.output_name}.json",
+    }
+    for path in output_paths.values():
+        if not body.overwrite and path.exists():
+            raise HTTPException(
+                status_code=400, detail=f"file {path} already exists"
+            )
+    start, end, txt = butterfly_fromtext.load_txt_data(input_path)
+    lf = butterfly_fromtext.extract_lat(txt)
+    try:
+        info = butterfly.ButterflyInfo(
+            -90, 90, start, end, butterfly.DateDelta(months=1)
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    with (output_paths["info"]).open("w") as f_info:
+        f_info.write(info.to_json())
+    df = butterfly.calc_lat(lf, info)
     df.write_parquet(output_paths["data"])
     return ButterflyAggRes(
         output_data=str(output_paths["data"]),
