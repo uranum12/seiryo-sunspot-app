@@ -90,7 +90,7 @@
           {#each ["North", "South", "Total"] as title, i}
             <button
               class="rounded-b-none border-2 border-b-0 border-gray-300"
-              class:border-blue-300={tabNumber === i}
+              class:!border-blue-300={tabNumber === i}
               onclick={() => (tabNumber = i)}
             >
               {title}
