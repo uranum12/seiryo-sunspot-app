@@ -4,6 +4,8 @@
   import ButterflyDraw from "@/pages/butterfly/draw.svelte"
   import ButterflyFromtext from "@/pages/butterfly/fromtext.svelte"
   import ButterflyImage from "@/pages/butterfly/image.svelte"
+  import ButterflyImageColor from "@/pages/butterfly/image_color.svelte"
+  import ButterflyMerge from "@/pages/butterfly/merge.svelte"
   import ButterflyTrim from "@/pages/butterfly/trim.svelte"
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
@@ -158,6 +160,8 @@
         },
         { path: "trim", name: "Trim", page: ButterflyTrim },
         { path: "image", name: "Image", page: ButterflyImage },
+        { path: "merge", name: "Merge", page: ButterflyMerge },
+        { path: "image_color", name: "Color Image", page: ButterflyImageColor },
         { path: "draw", name: "Draw", page: ButterflyDraw },
       ],
     },

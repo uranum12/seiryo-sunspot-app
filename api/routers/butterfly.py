@@ -1,4 +1,5 @@
 import json
+import shutil
 from datetime import date
 from pathlib import Path
 
@@ -12,6 +13,7 @@ from api.libs import (
     butterfly_draw,
     butterfly_fromtext,
     butterfly_image,
+    butterfly_merge,
     butterfly_trim,
     utils,
 )
@@ -52,6 +54,29 @@ class ButterflyImage(BaseModel):
 
 class ButterflyImageRes(BaseModel):
     output_image: str
+
+
+class ButterflyImageColor(BaseModel):
+    input_name: str
+    colors_name: str
+    output_name: str
+    overwrite: bool = False
+
+
+class ButterflyImageColorRes(BaseModel):
+    output_info: str
+    output_image: str
+
+
+class ButterflyMerge(BaseModel):
+    input_names: list[str]
+    output_name: str
+    overwrite: bool = False
+
+
+class ButterflyMergeRes(BaseModel):
+    output_info: str
+    output_img: str
 
 
 router = APIRouter(prefix="/butterfly", tags=["butterfly"])
@@ -205,6 +230,90 @@ def butterfly_img(body: ButterflyImage) -> ButterflyImageRes:
     with output_path.open("wb") as f_img:
         np.savez_compressed(f_img, img=img)
     return ButterflyImageRes(output_image=str(output_path))
+
+
+@router.post("/image_color", response_model=ButterflyImageColorRes)
+def image_color(body: ButterflyImageColor) -> ButterflyImageColorRes:
+    info_path = Path(body.input_name).with_suffix(".json")
+    if not info_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {info_path} not found"
+        )
+    img_path = info_path.with_suffix(".npz")
+    if not img_path.exists():
+        raise HTTPException(
+            status_code=404, detail=f"file {img_path} not found"
+        )
+    colors_path = Path(body.colors_name)
+    if not colors_path.exists():
+        raise HTTPException(
+                status_code=404, detail=f"colors {colors_path} not found"
+                )
+    output_dir = Path("out/butterfly")
+    output_dir.mkdir(exist_ok=True, parents=True)
+    output_paths = {
+        "info": output_dir / f"{body.output_name}.json",
+        "img": output_dir / f"{body.output_name}.npz",
+    }
+    for path in output_paths.values():
+        if not body.overwrite and path.exists():
+            raise HTTPException(
+                status_code=400, detail=f"file {path} already exists"
+            )
+    with np.load(img_path) as f_img:
+        img = f_img["img"]
+    with colors_path.open("r") as f_color:
+        json_data = json.load(f_color)
+        cmap = [butterfly_merge.Color(**item) for item in json_data]
+    img_color = butterfly_merge.create_color_image(img, cmap)
+    with output_paths["img"].open("wb") as f_img_color:
+        np.savez_compressed(f_img_color, img=img_color)
+    shutil.copy(info_path, output_paths["info"])
+    return ButterflyImageColorRes(
+        output_info=str(output_paths["info"]),
+        output_image=str(output_paths["img"]),
+    )
+
+
+@router.post("/merge", response_model=ButterflyMergeRes)
+def merge(body: ButterflyMerge) -> ButterflyMergeRes:
+    data_paths = [
+        Path(name).with_suffix(".parquet") for name in body.input_names
+    ]
+    info_paths = [path.with_suffix(".json") for path in data_paths]
+    for path in data_paths + info_paths:
+        if not path.exists():
+            raise HTTPException(
+                status_code=404, detail=f"file {path} not found"
+            )
+    output_dir = Path("out/butterfly")
+    output_dir.mkdir(exist_ok=True, parents=True)
+    output_paths = {
+        "info": output_dir / f"{body.output_name}.json",
+        "img": output_dir / f"{body.output_name}.npz",
+    }
+    for path in output_paths.values():
+        if not body.overwrite and path.exists():
+            raise HTTPException(
+                status_code=400, detail=f"file {path} already exists"
+            )
+    info_list: list[butterfly.ButterflyInfo] = []
+    for path in info_paths:
+        with path.open("r") as f_info:
+            info_list.append(
+                butterfly.ButterflyInfo.from_dict(json.load(f_info))
+            )
+    info = butterfly_merge.merge_info(info_list)
+    dfl = [pl.read_parquet(path) for path in data_paths]
+    img = butterfly_merge.create_merged_image(dfl, info)
+    with output_paths["info"].open("w") as f_info:
+        f_info.write(info.to_json())
+    with output_paths["img"].open("wb") as f_img:
+        np.savez_compressed(f_img, img=img)
+    return ButterflyMergeRes(
+        output_info=str(output_paths["info"]),
+        output_img=str(output_paths["img"]),
+    )
 
 
 @router.get("/draw/butterfly", response_model=draw.PreviewRes)
