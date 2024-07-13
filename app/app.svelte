@@ -10,6 +10,7 @@
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
   import CheckFinder from "@/pages/check/finder.svelte"
+  import Home from "@/pages/home.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
   import ObservationsCalendar from "@/pages/observations/calendar.svelte"
   import ObservationsMonthly from "@/pages/observations/monthly.svelte"
@@ -39,7 +40,7 @@
   $effect(getPageName)
 
   const pages: Page[] = [
-    { path: "", name: "Home", page: Agg },
+    { path: "", name: "Home", page: Home },
     { path: "agg", name: "Agg", page: Agg },
     {
       path: "check",
