@@ -1,6 +1,7 @@
 {
   "name": "seiryo-sunspot-app",
   "private": true,
+  "browserslist": ["> 0.5%", "not dead"],
   "type": "module",
   "dependencies": {
     "date-fns": "^3.6.0"
