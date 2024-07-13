@@ -1,14 +1,12 @@
-import json
 from datetime import date
 from pathlib import Path
 
 import polars as pl
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
-from api.libs import observations, observations_calendar, utils
-from api.libs.observations_config import ObservationsMonthly
-from api.models import draw
+from api.libs import observations, observations_calendar
+from api.routers.draw.observations import router as router_draw
 
 
 class ObservationsAgg(BaseModel):
@@ -31,6 +29,7 @@ class ObservationsCalendarRes(BaseModel):
 
 
 router = APIRouter(prefix="/observations", tags=["observations"])
+router.include_router(router_draw)
 
 
 @router.post("/agg", response_model=ObservationsAggRes)
@@ -62,68 +61,6 @@ def observations_agg(body: ObservationsAgg) -> ObservationsAggRes:
         output_monthly=str(output_paths["monthly"]),
     )
 
-
-@router.get("/draw/monthly", response_model=draw.PreviewRes)
-def observations_draw_monthly_preview(
-    query: draw.PreviewQuery = Depends(),
-) -> draw.PreviewRes:
-    input_path = Path(query.filename)
-    if not input_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"file {input_path} not found"
-        )
-    config_path = Path(query.config_name)
-    if not config_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"config {config_path} not found"
-        )
-    try:
-        with config_path.open("r") as f:
-            config = ObservationsMonthly(**json.load(f))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=400, detail=f"config {config_path} is broken"
-        ) from e
-    df = pl.read_parquet(input_path)
-    fig = observations.draw_monthly_obs_days(df, config)
-    img = utils.fig_to_base64(fig)
-    return draw.PreviewRes(img=img)
-
-
-@router.post("/draw/monthly", response_model=draw.SaveRes)
-def observations_draw_monthly_save(body: draw.SaveBody) -> draw.SaveRes:
-    input_path = Path(body.input)
-    if not input_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"file {input_path} not found"
-        )
-    config_path = Path(body.config)
-    if not config_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"config {config_path} not found"
-        )
-    output_path = input_path.with_name(f"monthly.{body.format}")
-    if not body.overwrite and output_path.exists():
-        raise HTTPException(
-            status_code=400, detail=f"file {output_path} already exists"
-        )
-    try:
-        with config_path.open("r") as f:
-            config = ObservationsMonthly(**json.load(f))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=400, detail=f"config {config_path} is broken"
-        ) from e
-    df = pl.read_parquet(input_path)
-    fig = observations.draw_monthly_obs_days(df, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
-    )
-    return draw.SaveRes(output=str(output_path))
 
 
 @router.get("/calendar", response_model=ObservationsCalendarRes)

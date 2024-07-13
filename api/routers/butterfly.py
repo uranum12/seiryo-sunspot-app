@@ -5,20 +5,17 @@ from pathlib import Path
 
 import numpy as np
 import polars as pl
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from api.libs import (
     butterfly,
-    butterfly_draw,
     butterfly_fromtext,
     butterfly_image,
     butterfly_merge,
     butterfly_trim,
-    utils,
 )
-from api.libs.butterfly_config import ButterflyDiagram
-from api.models import draw
+from api.routers.draw.butterfly import router as router_draw
 
 
 class ButterflyAgg(BaseModel):
@@ -80,6 +77,7 @@ class ButterflyMergeRes(BaseModel):
 
 
 router = APIRouter(prefix="/butterfly", tags=["butterfly"])
+router.include_router(router_draw)
 
 
 @router.post("/agg", response_model=ButterflyAggRes)
@@ -315,69 +313,3 @@ def merge(body: ButterflyMerge) -> ButterflyMergeRes:
         output_img=str(output_paths["img"]),
     )
 
-
-@router.get("/draw/butterfly", response_model=draw.PreviewRes)
-def draw_butterfly(query: draw.PreviewQuery = Depends()) -> draw.PreviewRes:
-    input_path = Path(query.filename)
-    if not input_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"file {input_path} not found"
-        )
-    config_path = Path(query.config_name)
-    if not config_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"config {config_path} not found"
-        )
-    try:
-        with config_path.open("r") as f:
-            config = ButterflyDiagram(**json.load(f))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=400, detail=f"config {config_path} is broken"
-        ) from e
-    with np.load(input_path.with_suffix(".npz")) as f_img:
-        img = f_img["img"]
-    with input_path.with_suffix(".json").open("r") as f_info:
-        info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
-    fig = butterfly_draw.draw_butterfly_diagram(img, info, config)
-    img = utils.fig_to_base64(fig)
-    return draw.PreviewRes(img=img)
-
-
-@router.post("/draw/butterfly", response_model=draw.SaveRes)
-def save_butterfly(body: draw.SaveBody) -> draw.SaveRes:
-    input_path = Path(body.input)
-    if not input_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"file {input_path} not found"
-        )
-    config_path = Path(body.config)
-    if not config_path.exists():
-        raise HTTPException(
-            status_code=404, detail=f"config {config_path} not found"
-        )
-    output_path = input_path.with_name(f"{input_path.stem}.{body.format}")
-    if not body.overwrite and output_path.exists():
-        raise HTTPException(
-            status_code=400, detail=f"file {output_path} already exists"
-        )
-    try:
-        with config_path.open("r") as f:
-            config = ButterflyDiagram(**json.load(f))
-    except ValueError as e:
-        raise HTTPException(
-            status_code=400, detail=f"config {config_path} is broken"
-        ) from e
-    with np.load(input_path.with_suffix(".npz")) as f_img:
-        img = f_img["img"]
-    with input_path.with_suffix(".json").open("r") as f_info:
-        info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
-    fig = butterfly_draw.draw_butterfly_diagram(img, info, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
-    )
-    return draw.SaveRes(output=str(output_path))
