@@ -245,8 +245,8 @@ def image_color(body: ButterflyImageColor) -> ButterflyImageColorRes:
     colors_path = Path(body.colors_name)
     if not colors_path.exists():
         raise HTTPException(
-                status_code=404, detail=f"colors {colors_path} not found"
-                )
+            status_code=404, detail=f"colors {colors_path} not found"
+        )
     output_dir = Path("out/butterfly")
     output_dir.mkdir(exist_ok=True, parents=True)
     output_paths = {
@@ -312,4 +312,3 @@ def merge(body: ButterflyMerge) -> ButterflyMergeRes:
         output_info=str(output_paths["info"]),
         output_img=str(output_paths["img"]),
     )
-

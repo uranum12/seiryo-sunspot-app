@@ -62,7 +62,6 @@ def observations_agg(body: ObservationsAgg) -> ObservationsAggRes:
     )
 
 
-
 @router.get("/calendar", response_model=ObservationsCalendarRes)
 def observations_get_calendar(
     filename: str, year: int, month: int, first: int = 0
