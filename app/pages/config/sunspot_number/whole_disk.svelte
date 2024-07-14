@@ -27,10 +27,12 @@
 
   const defaultConfig = "config/sunspot_number/whole_disk.json"
 
-  let configName = $state<string>(defaultConfig)
-
   let tabNumber = $state<number>(0)
   let showConfirmOverwrite = $state<boolean>(false)
+
+  let config = $state<SunspotNumberWholeDisk>()
+
+  let configName = $state<string>(defaultConfig)
 
   let figSize = $state<SunspotNumberWholeDisk["figSize"]>()
   let line = $state<SunspotNumberWholeDisk["line"]>()
@@ -46,17 +48,21 @@
   let previewPromise = $state<ReturnType<typeof postPreviewConfigWholeDisk>>()
   let savePromise = $state<ReturnType<typeof postConfigWholeDisk>>()
 
-  let config = $state<SunspotNumberWholeDisk>()
-
   const fetchFiles = () => {
+    configPromise = undefined
+    previewPromise = undefined
+    savePromise = undefined
     filesPromise = getFilesConfig()
   }
 
   const fetchConfig = () => {
+    previewPromise = undefined
+    savePromise = undefined
     configPromise = getConfigWholeDisk({ configName })
   }
 
   const fetchPreview = () => {
+    savePromise = undefined
     const result = safeParse(schemaSunspotNumberWholeDisk, {
       figSize,
       line,
