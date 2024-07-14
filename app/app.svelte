@@ -10,6 +10,7 @@
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
   import CheckFinder from "@/pages/check/finder.svelte"
+  import ConfigSunspotNumberWholeDisk from "@/pages/config/sunspot_number/whole_disk.svelte"
   import Home from "@/pages/home.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
   import ObservationsCalendar from "@/pages/observations/calendar.svelte"
@@ -164,6 +165,23 @@
         { path: "merge", name: "Merge", page: ButterflyMerge },
         { path: "image_color", name: "Color Image", page: ButterflyImageColor },
         { path: "draw", name: "Draw", page: ButterflyDraw },
+      ],
+    },
+    {
+      path: "config",
+      name: "Config",
+      children: [
+        {
+          path: "sunspot_number",
+          name: "Sunspot Number",
+          children: [
+            {
+              path: "whole_disk",
+              name: "Whole Disk",
+              page: ConfigSunspotNumberWholeDisk,
+            },
+          ],
+        },
       ],
     },
   ]
