@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { type InferOutput, safeParse } from "valibot"
+  import type { InferOutput } from "valibot"
 
   import {
     getConfigWholeDisk,
@@ -7,18 +7,19 @@
     postPreviewConfigWholeDisk,
   } from "@/api/config/sunspot_number"
   import { getFiles } from "@/api/files"
-  import { getFonts } from "@/api/fonts"
-  import Alert from "@/components/alert.svelte"
   import Axis from "@/components/config/axis.svelte"
   import FigSize from "@/components/config/fig_size.svelte"
   import Line from "@/components/config/line.svelte"
   import Title from "@/components/config/title.svelte"
-  import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import Tab from "@/components/tab.svelte"
+  import ConfigPage from "@/pages/common/config.svelte"
+  // biome-ignore lint/style/useImportType: biome dosen't support html template yet.
   import { schemaSunspotNumberWholeDisk } from "@/schemas/sunspot_number"
-  import { FetchError } from "@/utils/fetch"
 
   type SunspotNumberWholeDisk = InferOutput<typeof schemaSunspotNumberWholeDisk>
+
+  const defaultConfig = "config/sunspot_number/whole_disk.json"
+  const configPattern = /^config\/sunspot_number\/whole_disk\//
 
   const getFilesConfig = () => {
     return getFiles({
@@ -27,199 +28,61 @@
     })
   }
 
-  const defaultConfig = "config/sunspot_number/whole_disk.json"
-
-  let showConfirmOverwrite = $state<boolean>(false)
-
-  let config = $state<SunspotNumberWholeDisk>()
-
-  let configName = $state<string>(defaultConfig)
-
   let figSize = $state<SunspotNumberWholeDisk["figSize"]>()
   let line = $state<SunspotNumberWholeDisk["line"]>()
   let title = $state<SunspotNumberWholeDisk["title"]>()
   let xaxis = $state<SunspotNumberWholeDisk["xaxis"]>()
   let yaxis = $state<SunspotNumberWholeDisk["yaxis"]>()
 
-  let outputName = $state<string>("")
-  let overwrite = $state<boolean>(false)
-
-  let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesConfig())
-  let fontsPromise = $state<ReturnType<typeof getFonts>>(getFonts())
-  let configPromise = $state<ReturnType<typeof getConfigWholeDisk>>()
-  let previewPromise = $state<ReturnType<typeof postPreviewConfigWholeDisk>>()
-  let savePromise = $state<ReturnType<typeof postConfigWholeDisk>>()
-
-  const fetchFiles = () => {
-    configPromise = undefined
-    previewPromise = undefined
-    savePromise = undefined
-    filesPromise = getFilesConfig()
-  }
-
-  const fetchConfig = () => {
-    previewPromise = undefined
-    savePromise = undefined
-    configPromise = getConfigWholeDisk({ configName })
-  }
-
-  const fetchPreview = () => {
-    savePromise = undefined
-    const result = safeParse(schemaSunspotNumberWholeDisk, {
-      figSize,
-      line,
-      title,
-      xaxis,
-      yaxis,
-    })
-    if (result.success) {
-      previewPromise = postPreviewConfigWholeDisk({ config: result.output })
-      config = result.output
-    }
-  }
-
-  const submitSave = () => {
-    if (config) {
-      savePromise = postConfigWholeDisk({
-        configName: outputName,
-        overwrite,
-        config,
-      })
-    }
-  }
-
-  const clickSave = () => {
-    if (overwrite) {
-      showConfirmOverwrite = true
-    } else {
-      submitSave()
-    }
-  }
+  const config = $derived<Partial<SunspotNumberWholeDisk>>({
+    figSize,
+    line,
+    title,
+    xaxis,
+    yaxis,
+  })
 </script>
 
-<section>
-  <button onclick={fetchFiles}>refresh files</button>
-</section>
-
-{#await filesPromise}
-  <p>loading...</p>
-{:then files}
-  <section class="space-y-1">
-    <select bind:value={configName}>
-      <option value={defaultConfig} selected>default</option>
-      {#each files as file}
-        <option value={file}
-          >{file.replace(/^config\/sunspot_number\/whole_disk\//, "")}</option
-        >
-      {/each}
-    </select>
-    <button onclick={fetchConfig}>edit</button>
-  </section>
-{:catch e}
-  <section>
-    <Alert type="error">
-      <p>{e.message}</p>
-    </Alert>
-  </section>
-{/await}
-
-{#if configPromise}
-  {#await Promise.all([configPromise, fontsPromise])}
-    <p>loading...</p>
-  {:then result}
-    {@const [currentConfig, fonts] = result}
-    <section class="space-y-1">
-      {#snippet tabPageFigSize()}
-        <FigSize init={currentConfig["figSize"]} bind:value={figSize} />
-      {/snippet}
-      {#snippet tabPageLine()}
-        <Line init={currentConfig["line"]} labelHidden bind:value={line} />
-      {/snippet}
-      {#snippet tabPageTitle()}
-        <Title
-          init={currentConfig["title"]}
-          {fonts}
-          positionHidden
-          bind:value={title}
-        />
-      {/snippet}
-      {#snippet tabPageXAxis()}
-        <Axis init={currentConfig["xaxis"]} {fonts} bind:value={xaxis} />
-      {/snippet}
-      {#snippet tabPageYAxis()}
-        <Axis init={currentConfig["yaxis"]} {fonts} bind:value={yaxis} />
-      {/snippet}
-      <Tab
-        titles={["FigSize", "Line", "Title", "X Axis", "Y Axis"]}
-        pages={[
-          tabPageFigSize,
-          tabPageLine,
-          tabPageTitle,
-          tabPageXAxis,
-          tabPageYAxis,
-        ]}
+<ConfigPage
+  {defaultConfig}
+  {configPattern}
+  schema={schemaSunspotNumberWholeDisk}
+  {config}
+  {getFilesConfig}
+  getConfig={getConfigWholeDisk}
+  postConfig={postConfigWholeDisk}
+  postPreview={postPreviewConfigWholeDisk}
+>
+  {#snippet configForm(currentConfig, fonts)}
+    {#snippet tabPageFigSize()}
+      <FigSize init={currentConfig["figSize"]} bind:value={figSize} />
+    {/snippet}
+    {#snippet tabPageLine()}
+      <Line init={currentConfig["line"]} labelHidden bind:value={line} />
+    {/snippet}
+    {#snippet tabPageTitle()}
+      <Title
+        init={currentConfig["title"]}
+        {fonts}
+        positionHidden
+        bind:value={title}
       />
-      <button onclick={fetchPreview}>preview</button>
-    </section>
-  {:catch e}
-    <section>
-      <Alert type="error">
-        <p>{e instanceof FetchError ? e.detail : e.message}</p>
-      </Alert>
-    </section>
-  {/await}
-{/if}
-
-{#if previewPromise}
-  {#await previewPromise}
-    <p>loading...</p>
-  {:then preview}
-    <section>
-      <img
-        src={`data:image/png;base64,${preview}`}
-        alt="config applied preview"
-      />
-    </section>
-
-    <section class="space-y-1">
-      <input
-        required
-        placeholder="output config name"
-        bind:value={outputName}
-      />
-      <label>
-        <input type="checkbox" bind:checked={overwrite} />
-        <span>Overwrite</span>
-      </label>
-      <button onclick={clickSave}>save</button>
-    </section>
-
-    <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitSave}>
-      Are you sure you want me to overwrite file ?
-    </ConfirmDialog>
-  {:catch e}
-    <section>
-      <Alert type="error">
-        <p>{e instanceof FetchError ? e.detail : e.message}</p>
-      </Alert>
-    </section>
-  {/await}
-{/if}
-
-{#if savePromise}
-  {#await savePromise}
-    <p>loading...</p>
-  {:then output}
-    <section>
-      <Alert type="success">
-        <p>config {output} generated</p>
-      </Alert>
-    </section>
-  {:catch e}
-    <section>
-      <Alert type="error">
-        <p>{e instanceof FetchError ? e.detail : e.message}</p>
-      </Alert>
-    </section>
-  {/await}
-{/if}
+    {/snippet}
+    {#snippet tabPageXAxis()}
+      <Axis init={currentConfig["xaxis"]} {fonts} bind:value={xaxis} />
+    {/snippet}
+    {#snippet tabPageYAxis()}
+      <Axis init={currentConfig["yaxis"]} {fonts} bind:value={yaxis} />
+    {/snippet}
+    <Tab
+      titles={["FigSize", "Line", "Title", "X Axis", "Y Axis"]}
+      pages={[
+        tabPageFigSize,
+        tabPageLine,
+        tabPageTitle,
+        tabPageXAxis,
+        tabPageYAxis,
+      ]}
+    />
+  {/snippet}
+</ConfigPage>
