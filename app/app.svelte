@@ -12,6 +12,8 @@
   import CheckFinder from "@/pages/check/finder.svelte"
   import ConfigSunspotNumberHemispheric from "@/pages/config/sunspot_number/hemispheric.svelte"
   import ConfigSunspotNumberWholeDisk from "@/pages/config/sunspot_number/whole_disk.svelte"
+  import ConfigSunspotNumberWithFlareHemispheric from "@/pages/config/sunspot_number/with_flare/hemispheric.svelte"
+  import ConfigSunspotNumberWithFlareDraw from "@/pages/config/sunspot_number/with_flare/with_flare.svelte"
   import ConfigSunspotNumberWithSilsoDiff from "@/pages/config/sunspot_number/with_silso/diff.svelte"
   import ConfigSunspotNumberWithSilsoRatio from "@/pages/config/sunspot_number/with_silso/ratio.svelte"
   import ConfigSunspotNumberWithSilsoRatioDiff1 from "@/pages/config/sunspot_number/with_silso/ratio_diff_1.svelte"
@@ -225,6 +227,22 @@
                   path: "ratio_diff_2",
                   name: "Ratio and Difference 2",
                   page: ConfigSunspotNumberWithSilsoRatioDiff2,
+                },
+              ],
+            },
+            {
+              path: "with_flare",
+              name: "With Flare Index",
+              children: [
+                {
+                  path: "with_flare",
+                  name: "With Flare Index",
+                  page: ConfigSunspotNumberWithFlareDraw,
+                },
+                {
+                  path: "hemispheric",
+                  name: "Hemispheric",
+                  page: ConfigSunspotNumberWithFlareHemispheric,
                 },
               ],
             },
