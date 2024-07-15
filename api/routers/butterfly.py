@@ -16,6 +16,7 @@ from api.libs import (
     butterfly_merge,
     butterfly_trim,
 )
+from api.routers.config.butterfly import router as router_config
 from api.routers.draw.butterfly import router as router_draw
 
 
@@ -78,6 +79,7 @@ class ButterflyMergeRes(BaseModel):
 
 
 router = APIRouter(prefix="/butterfly", tags=["butterfly"])
+router.include_router(router_config)
 router.include_router(router_draw)
 
 

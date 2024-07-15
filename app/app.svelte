@@ -10,6 +10,8 @@
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
   import CheckFinder from "@/pages/check/finder.svelte"
+  import ConfigButterflyDraw from "@/pages/config/butterfly/butterfly.svelte"
+  import ConfigButterflyColorMap from "@/pages/config/butterfly/color_map.svelte"
   import ConfigObservationsMonthly from "@/pages/config/observations/monthly.svelte"
   import ConfigSunspotNumberHemispheric from "@/pages/config/sunspot_number/hemispheric.svelte"
   import ConfigSunspotNumberWholeDisk from "@/pages/config/sunspot_number/whole_disk.svelte"
@@ -257,6 +259,22 @@
               path: "monthly",
               name: "Monthly",
               page: ConfigObservationsMonthly,
+            },
+          ],
+        },
+        {
+          path: "butterfly",
+          name: "Butterfly Diagram",
+          children: [
+            {
+              path: "butterfly",
+              name: "Butterfly Diagram",
+              page: ConfigButterflyDraw,
+            },
+            {
+              path: "color_map",
+              name: "Color Map",
+              page: ConfigButterflyColorMap,
             },
           ],
         },
