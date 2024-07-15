@@ -56,6 +56,8 @@
 
   const parseResult = $derived(safeParse(schema, configInput))
 
+  const saveSubmitDisabled = $derived(outputName.trim() === "")
+
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesConfig())
   let fontsPromise = $state<ReturnType<typeof getFonts>>(getFonts())
   let configPromise = $state<ReturnType<typeof getConfig>>()
@@ -169,7 +171,7 @@
         <input type="checkbox" bind:checked={overwrite} />
         <span>Overwrite</span>
       </label>
-      <button onclick={clickSave}>save</button>
+      <button disabled={saveSubmitDisabled} onclick={clickSave}>save</button>
     </section>
 
     <ConfirmDialog bind:isOpen={showConfirmOverwrite} onConfirm={submitSave}>
