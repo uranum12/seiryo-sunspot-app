@@ -10,6 +10,7 @@
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
   import CheckFinder from "@/pages/check/finder.svelte"
+  import ConfigObservationsMonthly from "@/pages/config/observations/monthly.svelte"
   import ConfigSunspotNumberHemispheric from "@/pages/config/sunspot_number/hemispheric.svelte"
   import ConfigSunspotNumberWholeDisk from "@/pages/config/sunspot_number/whole_disk.svelte"
   import ConfigSunspotNumberWithFlareHemispheric from "@/pages/config/sunspot_number/with_flare/hemispheric.svelte"
@@ -245,6 +246,17 @@
                   page: ConfigSunspotNumberWithFlareHemispheric,
                 },
               ],
+            },
+          ],
+        },
+        {
+          path: "observations",
+          name: "Observations",
+          children: [
+            {
+              path: "monthly",
+              name: "Monthly",
+              page: ConfigObservationsMonthly,
             },
           ],
         },
