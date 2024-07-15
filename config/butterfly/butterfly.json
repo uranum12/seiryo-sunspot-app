@@ -1,6 +1,6 @@
 {
   "fig_size": { "width": 8.0, "height": 5.0 },
-  "index": { "year_inteerval": 2, "lat_interval": 10 },
+  "index": { "year_interval": 2, "lat_interval": 10 },
   "image": { "cmap": "binary", "aspect": 1.0 },
   "title": {
     "text": "butterfly diagram",

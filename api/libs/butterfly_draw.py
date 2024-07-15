@@ -61,7 +61,7 @@ def draw_butterfly_diagram(
     xlabel = [
         (i, f"{d.year}")
         for i, d in enumerate(item.item() for item in date_index)
-        if d.month == 1 and d.year % config.index.year_inteerval == 0
+        if d.month == 1 and d.year % config.index.year_interval == 0
     ]
     ylabel = [
         (i, n)

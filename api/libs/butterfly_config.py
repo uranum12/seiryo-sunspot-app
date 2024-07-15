@@ -4,7 +4,7 @@ from api.libs.config_common import Axis, FigSize, Image, Title
 
 
 class Index(BaseModel):
-    year_inteerval: int
+    year_interval: int
     lat_interval: int
 
 

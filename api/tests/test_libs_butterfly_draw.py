@@ -103,7 +103,7 @@ def test_draw_butterfly_diagram() -> None:
     )
     config = ButterflyDiagram(
         fig_size=FigSize(width=8.0, height=5.0),
-        index=Index(year_inteerval=10, lat_interval=10),
+        index=Index(year_interval=10, lat_interval=10),
         image=Image(cmap="binary", aspect=1.0),
         title=Title(
             text="butterfly diagram",
