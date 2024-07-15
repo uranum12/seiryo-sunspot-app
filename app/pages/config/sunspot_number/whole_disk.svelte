@@ -13,6 +13,7 @@
   import Line from "@/components/config/line.svelte"
   import Title from "@/components/config/title.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
+  import Tab from "@/components/tab.svelte"
   import { schemaSunspotNumberWholeDisk } from "@/schemas/sunspot_number"
   import { FetchError } from "@/utils/fetch"
 
@@ -27,7 +28,6 @@
 
   const defaultConfig = "config/sunspot_number/whole_disk.json"
 
-  let tabNumber = $state<number>(0)
   let showConfirmOverwrite = $state<boolean>(false)
 
   let config = $state<SunspotNumberWholeDisk>()
@@ -126,40 +126,35 @@
     <p>loading...</p>
   {:then currentConfig}
     <section class="space-y-1">
-      <div>
-        <div class="flex gap-x-2 px-2">
-          {#each ["FigSize", "Line", "Title", "X Axis", "Y Axis"] as title, i}
-            <button
-              class="rounded-b-none border-2 border-b-0 border-gray-300"
-              class:!border-blue-300={tabNumber === i}
-              onclick={() => (tabNumber = i)}
-            >
-              {title}
-            </button>
-          {/each}
-        </div>
-        <div class="rounded border border-gray-300 p-2">
-          <div class:hidden={tabNumber !== 0}>
-            <FigSize init={currentConfig["figSize"]} bind:value={figSize} />
-          </div>
-          <div class:hidden={tabNumber !== 1}>
-            <Line init={currentConfig["line"]} labelHidden bind:value={line} />
-          </div>
-          <div class:hidden={tabNumber !== 2}>
-            <Title
-              init={currentConfig["title"]}
-              positionHidden
-              bind:value={title}
-            />
-          </div>
-          <div class:hidden={tabNumber !== 3}>
-            <Axis init={currentConfig["xaxis"]} bind:value={xaxis} />
-          </div>
-          <div class:hidden={tabNumber !== 4}>
-            <Axis init={currentConfig["yaxis"]} bind:value={yaxis} />
-          </div>
-        </div>
-      </div>
+      {#snippet tabPageFigSize()}
+        <FigSize init={currentConfig["figSize"]} bind:value={figSize} />
+      {/snippet}
+      {#snippet tabPageLine()}
+        <Line init={currentConfig["line"]} labelHidden bind:value={line} />
+      {/snippet}
+      {#snippet tabPageTitle()}
+        <Title
+          init={currentConfig["title"]}
+          positionHidden
+          bind:value={title}
+        />
+      {/snippet}
+      {#snippet tabPageXAxis()}
+        <Axis init={currentConfig["xaxis"]} bind:value={xaxis} />
+      {/snippet}
+      {#snippet tabPageYAxis()}
+        <Axis init={currentConfig["yaxis"]} bind:value={yaxis} />
+      {/snippet}
+      <Tab
+        titles={["FigSize", "Line", "Title", "X Axis", "Y Axis"]}
+        pages={[
+          tabPageFigSize,
+          tabPageLine,
+          tabPageTitle,
+          tabPageXAxis,
+          tabPageYAxis,
+        ]}
+      />
       <button onclick={fetchPreview}>preview</button>
     </section>
   {:catch e}

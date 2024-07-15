@@ -4,6 +4,7 @@
   import Alert from "@/components/alert.svelte"
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import FileSelect from "@/components/file_select.svelte"
+  import Tab from "@/components/tab.svelte"
   import { FetchError } from "@/utils/fetch"
 
   let seiryoPath = $state<string>("")
@@ -12,8 +13,6 @@
   let flareFilesTotal = $state<string[]>([])
   let outputName = $state<string>("")
   let overwrite = $state<boolean>(false)
-
-  let tabNumber = $state<number>(0)
 
   let showConfirmOverwrite = $state<boolean>(false)
 
@@ -85,30 +84,19 @@
     </section>
   {:else}
     <section class="space-y-1">
-      <div>
-        <div class="flex gap-x-2 px-2">
-          {#each ["North", "South", "Total"] as title, i}
-            <button
-              class="rounded-b-none border-2 border-b-0 border-gray-300"
-              class:!border-blue-300={tabNumber === i}
-              onclick={() => (tabNumber = i)}
-            >
-              {title}
-            </button>
-          {/each}
-        </div>
-        <div class="rounded border border-gray-300 p-2">
-          <div class:hidden={tabNumber !== 0}>
-            <FileSelect files={filesFlare} bind:selected={flareFilesNorth} />
-          </div>
-          <div class:hidden={tabNumber !== 1}>
-            <FileSelect files={filesFlare} bind:selected={flareFilesSouth} />
-          </div>
-          <div class:hidden={tabNumber !== 2}>
-            <FileSelect files={filesFlare} bind:selected={flareFilesTotal} />
-          </div>
-        </div>
-      </div>
+      {#snippet tabPageNorth()}
+        <FileSelect files={filesFlare} bind:selected={flareFilesNorth} />
+      {/snippet}
+      {#snippet tabPageSouth()}
+        <FileSelect files={filesFlare} bind:selected={flareFilesSouth} />
+      {/snippet}
+      {#snippet tabPageTotal()}
+        <FileSelect files={filesFlare} bind:selected={flareFilesTotal} />
+      {/snippet}
+      <Tab
+        titles={["North", "South", "Total"]}
+        pages={[tabPageNorth, tabPageSouth, tabPageTotal]}
+      />
       <select required bind:value={seiryoPath}>
         <option value="" selected disabled>select file for seiryo</option>
         {#each filesSeiryo.sort() as file}
