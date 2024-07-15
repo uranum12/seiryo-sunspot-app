@@ -5,11 +5,11 @@
   import { getFiles } from "@/api/files"
   import Axis from "@/components/config/axis.svelte"
   import FigSize from "@/components/config/fig_size.svelte"
+  import Legend from "@/components/config/legend.svelte"
   import Line from "@/components/config/line.svelte"
   import Title from "@/components/config/title.svelte"
   import Tab from "@/components/tab.svelte"
   import ConfigPage from "@/pages/common/config.svelte"
-  import Legend from "@/components/config/legend.svelte"
   // biome-ignore lint/style/useImportType: biome dosen't support html template yet.
   import { schemaSunspotNumberHemispheric } from "@/schemas/sunspot_number"
 
