@@ -10,6 +10,7 @@
   import CheckData from "@/pages/check/data.svelte"
   import CheckFile from "@/pages/check/file.svelte"
   import CheckFinder from "@/pages/check/finder.svelte"
+  import ConfigSunspotNumberHemispheric from "@/pages/config/sunspot_number/hemispheric.svelte"
   import ConfigSunspotNumberWholeDisk from "@/pages/config/sunspot_number/whole_disk.svelte"
   import Home from "@/pages/home.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
@@ -179,6 +180,11 @@
               path: "whole_disk",
               name: "Whole Disk",
               page: ConfigSunspotNumberWholeDisk,
+            },
+            {
+              path: "hemispheric",
+              name: "Hemispheric",
+              page: ConfigSunspotNumberHemispheric,
             },
           ],
         },
