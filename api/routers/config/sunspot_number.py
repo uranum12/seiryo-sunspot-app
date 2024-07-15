@@ -4,6 +4,7 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import ValidationError
 
 from api.libs import sunspot_number, utils
 from api.libs.sunspot_number_config import (
@@ -88,6 +89,9 @@ def hemispheric_preview(
             "south": (1 - np.cos(np.linspace(-0.5, 7.5, 132))) * 100,
         }
     )
-    fig = sunspot_number.draw_sunspot_number_hemispheric(df, body.config)
+    try:
+        fig = sunspot_number.draw_sunspot_number_hemispheric(df, body.config)
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
     img = utils.fig_to_base64(fig)
     return PreviewRes(img=img)
