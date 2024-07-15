@@ -54,6 +54,8 @@
   let outputName = $state<string>("")
   let overwrite = $state<boolean>(false)
 
+  const parseResult = $derived(safeParse(schema, configInput))
+
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesConfig())
   let fontsPromise = $state<ReturnType<typeof getFonts>>(getFonts())
   let configPromise = $state<ReturnType<typeof getConfig>>()
@@ -75,10 +77,9 @@
 
   const fetchPreview = () => {
     savePromise = undefined
-    const result = safeParse(schema, configInput)
-    if (result.success) {
-      previewPromise = postPreview({ config: result.output })
-      config = result.output
+    if (parseResult.success) {
+      previewPromise = postPreview({ config: parseResult.output })
+      config = parseResult.output
     }
   }
 
@@ -134,7 +135,9 @@
     {@const [currentConfig, fonts] = result}
     <section class="space-y-1">
       {@render configForm(currentConfig, fonts)}
-      <button onclick={fetchPreview}>preview</button>
+      <button onclick={fetchPreview} disabled={!parseResult.success}>
+        preview
+      </button>
     </section>
   {:catch e}
     <section>
