@@ -17,16 +17,18 @@
 </script>
 
 <div class={className}>
-  <div class="flex gap-x-2 px-2">
-    {#each titles as title, i}
-      <button
-        class="rounded-b-none border-2 border-b-0 border-gray-300"
-        class:!border-blue-300={tabNumber === i}
-        onclick={() => tabClick(i)}
-      >
-        {title}
-      </button>
-    {/each}
+  <div class="px-2">
+    <div class="flex gap-x-2 overflow-x-auto">
+      {#each titles as title, i}
+        <button
+          class="rounded-b-none border-2 border-b-0 border-gray-300"
+          class:!border-blue-300={tabNumber === i}
+          onclick={() => tabClick(i)}
+        >
+          {title}
+        </button>
+      {/each}
+    </div>
   </div>
   <div class="rounded border border-gray-300 p-2">
     {#each pages as page, i}
