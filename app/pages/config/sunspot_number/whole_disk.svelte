@@ -1,11 +1,7 @@
 <script lang="ts">
   import type { InferOutput } from "valibot"
 
-  import {
-    getConfigWholeDisk,
-    postConfigWholeDisk,
-    postPreviewConfigWholeDisk,
-  } from "@/api/config/sunspot_number"
+  import { getConfig, postConfig, postPreview } from "@/api/config"
   import { getFiles } from "@/api/files"
   import Axis from "@/components/config/axis.svelte"
   import FigSize from "@/components/config/fig_size.svelte"
@@ -26,6 +22,24 @@
       path: "config/sunspot_number/whole_disk",
       glob: "*.json",
     })
+  }
+
+  const getConfigWholeDisk = (
+    params: Parameters<typeof getConfig>[1]
+  ): ReturnType<typeof getConfig<SunspotNumberWholeDisk>> => {
+    return getConfig("/api/sunspot_number/config/whole_disk", params)
+  }
+
+  const postConfigWholeDisk = (
+    body: Parameters<typeof postConfig<SunspotNumberWholeDisk>>[1]
+  ): ReturnType<typeof postConfig> => {
+    return postConfig("/api/sunspot_number/config/whole_disk", body)
+  }
+
+  const postPreviewWholeDisk = (
+    body: Parameters<typeof postPreview<SunspotNumberWholeDisk>>[1]
+  ): ReturnType<typeof postPreview> => {
+    return postPreview("/api/sunspot_number/config/whole_disk/preview", body)
   }
 
   let figSize = $state<SunspotNumberWholeDisk["figSize"]>()
@@ -51,7 +65,7 @@
   {getFilesConfig}
   getConfig={getConfigWholeDisk}
   postConfig={postConfigWholeDisk}
-  postPreview={postPreviewConfigWholeDisk}
+  postPreview={postPreviewWholeDisk}
 >
   {#snippet configForm(currentConfig, fonts)}
     {#snippet tabPageFigSize()}

@@ -6,7 +6,7 @@
     getConfig as getConfigType,
     postConfig as postConfigType,
     postPreview as postPreviewType,
-  } from "@/api/config/common"
+  } from "@/api/config"
   import type { getFiles } from "@/api/files"
   import { getFonts } from "@/api/fonts"
   import Alert from "@/components/alert.svelte"
