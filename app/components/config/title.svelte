@@ -7,11 +7,17 @@
 
   type Props = {
     init: Title
+    fonts: string[]
     positionHidden?: boolean
     value: Title | undefined
   }
 
-  let { init, positionHidden: hidden, value = $bindable() }: Props = $props()
+  let {
+    init,
+    fonts,
+    positionHidden: hidden,
+    value = $bindable(),
+  }: Props = $props()
 
   let text = $state<Title["text"] | undefined>(init.text)
   let fontFamily = $state<Title["fontFamily"] | undefined>(init.fontFamily)
@@ -28,7 +34,12 @@
 
 <div class="space-y-1">
   <input placeholder="text" bind:value={text} />
-  <input placeholder="font family" bind:value={fontFamily} />
+  <select bind:value={fontFamily}>
+    <option value="" disabled>select font family</option>
+    {#each fonts.sort() as font}
+      <option value={font}>{font}</option>
+    {/each}
+  </select>
   <input placeholder="font size" type="number" bind:value={fontSize} />
   <input
     placeholder="title position"

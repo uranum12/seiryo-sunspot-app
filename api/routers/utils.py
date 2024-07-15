@@ -1,6 +1,7 @@
 import csv
 from pathlib import Path
 
+import matplotlib.font_manager as fm
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -15,6 +16,10 @@ class FileCsvQuery(BaseModel):
 
 class FileCsvRes(BaseModel):
     data: list[list[str | None]]
+
+
+class FontsRes(BaseModel):
+    names: list[str]
 
 
 router = APIRouter(prefix="/utils", tags=["utils"])
@@ -41,3 +46,12 @@ def file_csv(query: FileCsvQuery = Depends()) -> FileCsvRes:
     return FileCsvRes(
         data=[(row + [None] * max_len)[:max_len] for row in data]
     )
+
+
+@router.get("/fonts", response_model=FontsRes)
+def fonts() -> FontsRes:
+    font_paths = fm.findSystemFonts(fontpaths=None, fontext="ttf")
+    fonts_set = {
+        fm.FontProperties(fname=path).get_name() for path in font_paths
+    }
+    return FontsRes(names=list(fonts_set))

@@ -7,10 +7,11 @@
 
   type Props = {
     init: Axis
+    fonts: string[]
     value: Axis | undefined
   }
 
-  let { init, value = $bindable() }: Props = $props()
+  let { init, fonts, value = $bindable() }: Props = $props()
 
   let titleText = $state(init.title.text)
   let titleFontFamily = $state(init.title.fontFamily)
@@ -41,9 +42,19 @@
 <div class="space-y-1">
   <h2>Title</h2>
   <input placeholder="text" bind:value={titleText} />
-  <input placeholder="font family" bind:value={titleFontFamily} />
+  <select bind:value={titleFontFamily}>
+    <option value="" disabled>select font family</option>
+    {#each fonts.sort() as font}
+      <option value={font}>{font}</option>
+    {/each}
+  </select>
   <input placeholder="font size" type="number" bind:value={titleFontSize} />
   <h2>Ticks</h2>
-  <input placeholder="font family" bind:value={ticksFontFamily} />
+  <select bind:value={ticksFontFamily}>
+    <option value="" disabled>select font family</option>
+    {#each fonts.sort() as font}
+      <option value={font}>{font}</option>
+    {/each}
+  </select>
   <input placeholder="font size" type="number" bind:value={ticksFontSize} />
 </div>

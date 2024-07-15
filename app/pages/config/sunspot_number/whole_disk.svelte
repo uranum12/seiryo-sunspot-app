@@ -7,6 +7,7 @@
     postPreviewConfigWholeDisk,
   } from "@/api/config/sunspot_number"
   import { getFiles } from "@/api/files"
+  import { getFonts } from "@/api/fonts"
   import Alert from "@/components/alert.svelte"
   import Axis from "@/components/config/axis.svelte"
   import FigSize from "@/components/config/fig_size.svelte"
@@ -44,6 +45,7 @@
   let overwrite = $state<boolean>(false)
 
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesConfig())
+  let fontsPromise = $state<ReturnType<typeof getFonts>>(getFonts())
   let configPromise = $state<ReturnType<typeof getConfigWholeDisk>>()
   let previewPromise = $state<ReturnType<typeof postPreviewConfigWholeDisk>>()
   let savePromise = $state<ReturnType<typeof postConfigWholeDisk>>()
@@ -122,9 +124,10 @@
 {/await}
 
 {#if configPromise}
-  {#await configPromise}
+  {#await Promise.all([configPromise, fontsPromise])}
     <p>loading...</p>
-  {:then currentConfig}
+  {:then result}
+    {@const [currentConfig, fonts] = result}
     <section class="space-y-1">
       {#snippet tabPageFigSize()}
         <FigSize init={currentConfig["figSize"]} bind:value={figSize} />
@@ -135,15 +138,16 @@
       {#snippet tabPageTitle()}
         <Title
           init={currentConfig["title"]}
+          {fonts}
           positionHidden
           bind:value={title}
         />
       {/snippet}
       {#snippet tabPageXAxis()}
-        <Axis init={currentConfig["xaxis"]} bind:value={xaxis} />
+        <Axis init={currentConfig["xaxis"]} {fonts} bind:value={xaxis} />
       {/snippet}
       {#snippet tabPageYAxis()}
-        <Axis init={currentConfig["yaxis"]} bind:value={yaxis} />
+        <Axis init={currentConfig["yaxis"]} {fonts} bind:value={yaxis} />
       {/snippet}
       <Tab
         titles={["FigSize", "Line", "Title", "X Axis", "Y Axis"]}
