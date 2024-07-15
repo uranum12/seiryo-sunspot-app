@@ -10,6 +10,7 @@ from pydantic import BaseModel
 
 from api.libs import (
     butterfly,
+    butterfly_config,
     butterfly_fromtext,
     butterfly_image,
     butterfly_merge,
@@ -260,9 +261,8 @@ def image_color(body: ButterflyImageColor) -> ButterflyImageColorRes:
             )
     with np.load(img_path) as f_img:
         img = f_img["img"]
-    with colors_path.open("r") as f_color:
-        json_data = json.load(f_color)
-        cmap = [butterfly_merge.Color(**item) for item in json_data]
+    with colors_path.open("r") as f_cmap:
+        cmap = butterfly_config.ColorMap(**json.load(f_cmap))
     img_color = butterfly_merge.create_color_image(img, cmap)
     with output_paths["img"].open("wb") as f_img_color:
         np.savez_compressed(f_img_color, img=img_color)

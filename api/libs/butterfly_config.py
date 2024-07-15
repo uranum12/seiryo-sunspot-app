@@ -21,3 +21,7 @@ class Color(BaseModel):
     red: int = Field(..., ge=0, le=0xFF)
     green: int = Field(..., ge=0, le=0xFF)
     blue: int = Field(..., ge=0, le=0xFF)
+
+
+class ColorMap(BaseModel):
+    cmap: list[Color]

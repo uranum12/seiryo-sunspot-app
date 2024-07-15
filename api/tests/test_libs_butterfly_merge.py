@@ -4,7 +4,7 @@ import numpy as np
 import polars as pl
 import pytest
 
-from api.libs import butterfly, butterfly_merge
+from api.libs import butterfly, butterfly_config, butterfly_merge
 
 
 def test_merge_info() -> None:
@@ -167,9 +167,9 @@ def test_create_merged_image(
         pytest.param(
             [[0, 0, 0], [0, 1, 2], [3, 2, 1]],
             [
-                butterfly_merge.Color(red=0xFF, green=0x00, blue=0x00),
-                butterfly_merge.Color(red=0x00, green=0xFF, blue=0x00),
-                butterfly_merge.Color(red=0x00, green=0x00, blue=0xFF),
+                butterfly_config.Color(red=0xFF, green=0x00, blue=0x00),
+                butterfly_config.Color(red=0x00, green=0xFF, blue=0x00),
+                butterfly_config.Color(red=0x00, green=0x00, blue=0xFF),
             ],
             [
                 [[0xFF, 0xFF, 0xFF], [0xFF, 0xFF, 0xFF], [0xFF, 0xFF, 0xFF]],
@@ -180,12 +180,12 @@ def test_create_merged_image(
         pytest.param(
             [[1, 2, 4], [1, 2, 4], [1, 2, 4]],
             [
-                butterfly_merge.Color(red=0xFF, green=0x00, blue=0x00),
-                butterfly_merge.Color(red=0x00, green=0xFF, blue=0x00),
-                butterfly_merge.Color(red=0x00, green=0x00, blue=0xFF),
-                butterfly_merge.Color(red=0xFF, green=0xFF, blue=0x00),
-                butterfly_merge.Color(red=0xFF, green=0x00, blue=0xFF),
-                butterfly_merge.Color(red=0x00, green=0xFF, blue=0xFF),
+                butterfly_config.Color(red=0xFF, green=0x00, blue=0x00),
+                butterfly_config.Color(red=0x00, green=0xFF, blue=0x00),
+                butterfly_config.Color(red=0x00, green=0x00, blue=0xFF),
+                butterfly_config.Color(red=0xFF, green=0xFF, blue=0x00),
+                butterfly_config.Color(red=0xFF, green=0x00, blue=0xFF),
+                butterfly_config.Color(red=0x00, green=0xFF, blue=0xFF),
             ],
             [
                 [[0xFF, 0x00, 0x00], [0x00, 0xFF, 0x00], [0xFF, 0xFF, 0x00]],
@@ -197,10 +197,11 @@ def test_create_merged_image(
 )
 def test_create_color_image(
     in_img: list[list[int]],
-    in_cmap: list[butterfly_merge.Color],
+    in_cmap: list[butterfly_config.Color],
     out_img: list[list[list[int]]],
 ) -> None:
     out = butterfly_merge.create_color_image(
-        np.array(in_img, dtype=np.uint16), in_cmap
+        np.array(in_img, dtype=np.uint16),
+        butterfly_config.ColorMap(cmap=in_cmap),
     )
     np.testing.assert_equal(out, out_img)

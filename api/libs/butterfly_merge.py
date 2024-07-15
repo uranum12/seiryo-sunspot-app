@@ -4,7 +4,7 @@ import polars as pl
 
 from api.libs import butterfly, butterfly_image
 from api.libs.butterfly import ButterflyInfo
-from api.libs.butterfly_config import Color
+from api.libs.butterfly_config import ColorMap
 
 
 def merge_info(info_list: list[ButterflyInfo]) -> ButterflyInfo:
@@ -58,9 +58,9 @@ def create_merged_image(
 
 
 def create_color_image(
-    img: npt.NDArray[np.uint16], cmap: list[Color]
+    img: npt.NDArray[np.uint16], cmap: ColorMap
 ) -> npt.NDArray[np.uint8]:
     img_merged = np.full((*img.shape, 3), 0xFF, dtype=np.uint8)
-    for i, c in enumerate(cmap, 1):
+    for i, c in enumerate(cmap.cmap, 1):
         img_merged[img == i] = (c.red, c.green, c.blue)
     return img_merged
