@@ -2,6 +2,7 @@ import {
   integer,
   minValue,
   nonEmpty,
+  nullish,
   number,
   object,
   pipe,
@@ -63,8 +64,8 @@ export const schemaAxis = object({
 })
 
 export const schemaText = object({
-  x: pipe(number(), minValue(0.01)),
-  y: pipe(number(), minValue(0.01)),
+  x: nullish(pipe(number(), minValue(0.01))),
+  y: nullish(pipe(number(), minValue(0.01))),
   mathFontFamily: pipe(string(), trim(), nonEmpty()),
   fontFamily: pipe(string(), trim(), nonEmpty()),
   fontSize: pipe(number(), integer(), minValue(1)),

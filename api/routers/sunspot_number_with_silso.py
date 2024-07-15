@@ -6,6 +6,9 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from api.libs import sunspot_number_with_silso
+from api.routers.config.sunspot_number_with_silso import (
+    router as router_config,
+)
 from api.routers.draw.sunspot_number_with_silso import router as router_draw
 
 
@@ -25,6 +28,7 @@ class SunspotNumberWithSilsoAggRes(BaseModel):
 router = APIRouter(
     prefix="/sunspot_number/with_silso", tags=["sunspot_number", "with_silso"]
 )
+router.include_router(router_config)
 router.include_router(router_draw)
 
 

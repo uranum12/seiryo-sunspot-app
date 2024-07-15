@@ -12,6 +12,12 @@
   import CheckFinder from "@/pages/check/finder.svelte"
   import ConfigSunspotNumberHemispheric from "@/pages/config/sunspot_number/hemispheric.svelte"
   import ConfigSunspotNumberWholeDisk from "@/pages/config/sunspot_number/whole_disk.svelte"
+  import ConfigSunspotNumberWithSilsoDiff from "@/pages/config/sunspot_number/with_silso/diff.svelte"
+  import ConfigSunspotNumberWithSilsoRatio from "@/pages/config/sunspot_number/with_silso/ratio.svelte"
+  import ConfigSunspotNumberWithSilsoRatioDiff1 from "@/pages/config/sunspot_number/with_silso/ratio_diff_1.svelte"
+  import ConfigSunspotNumberWithSilsoRatioDiff2 from "@/pages/config/sunspot_number/with_silso/ratio_diff_2.svelte"
+  import ConfigSunspotNumberWithSilsoScatter from "@/pages/config/sunspot_number/with_silso/scatter.svelte"
+  import ConfigSunspotNumberWithSilsoDraw from "@/pages/config/sunspot_number/with_silso/with_silso.svelte"
   import Home from "@/pages/home.svelte"
   import ObservationsAgg from "@/pages/observations/agg.svelte"
   import ObservationsCalendar from "@/pages/observations/calendar.svelte"
@@ -185,6 +191,42 @@
               path: "hemispheric",
               name: "Hemispheric",
               page: ConfigSunspotNumberHemispheric,
+            },
+            {
+              path: "with_silso",
+              name: "With SILSO",
+              children: [
+                {
+                  path: "with_silso",
+                  name: "With SILSO",
+                  page: ConfigSunspotNumberWithSilsoDraw,
+                },
+                {
+                  path: "scatter",
+                  name: "Scatter",
+                  page: ConfigSunspotNumberWithSilsoScatter,
+                },
+                {
+                  path: "ratio",
+                  name: "Ratio",
+                  page: ConfigSunspotNumberWithSilsoRatio,
+                },
+                {
+                  path: "diff",
+                  name: "Difference",
+                  page: ConfigSunspotNumberWithSilsoDiff,
+                },
+                {
+                  path: "ratio_diff_1",
+                  name: "Ratio and Difference 1",
+                  page: ConfigSunspotNumberWithSilsoRatioDiff1,
+                },
+                {
+                  path: "ratio_diff_2",
+                  name: "Ratio and Difference 2",
+                  page: ConfigSunspotNumberWithSilsoRatioDiff2,
+                },
+              ],
             },
           ],
         },
