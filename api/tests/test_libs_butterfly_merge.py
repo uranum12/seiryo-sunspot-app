@@ -7,30 +7,6 @@ import pytest
 from api.libs import butterfly, butterfly_merge
 
 
-def test_color() -> None:
-    color = butterfly_merge.Color(2, 4, 6)
-    dict_expected = {"red": 2, "green": 4, "blue": 6}
-    tuple_expected = (2, 4, 6)
-    assert color.to_dict() == dict_expected
-    assert color.to_tuple() == tuple_expected
-
-
-@pytest.mark.parametrize(
-    ("in_red", "in_green", "in_blue"),
-    [
-        pytest.param(1000, 10, 10),
-        pytest.param(-10, 10, 10),
-        pytest.param(10, 1000, 10),
-        pytest.param(10, -10, 10),
-        pytest.param(10, 10, 1000),
-        pytest.param(10, 10, -10),
-    ],
-)
-def test_color_with_error(in_red: int, in_green: int, in_blue: int) -> None:
-    with pytest.raises(ValueError, match="color value must be 0x00 to 0xFF"):
-        _ = butterfly_merge.Color(in_red, in_green, in_blue)
-
-
 def test_merge_info() -> None:
     info1 = butterfly.ButterflyInfo(
         -10,
@@ -191,9 +167,9 @@ def test_create_merged_image(
         pytest.param(
             [[0, 0, 0], [0, 1, 2], [3, 2, 1]],
             [
-                butterfly_merge.Color(0xFF, 0x00, 0x00),
-                butterfly_merge.Color(0x00, 0xFF, 0x00),
-                butterfly_merge.Color(0x00, 0x00, 0xFF),
+                butterfly_merge.Color(red=0xFF, green=0x00, blue=0x00),
+                butterfly_merge.Color(red=0x00, green=0xFF, blue=0x00),
+                butterfly_merge.Color(red=0x00, green=0x00, blue=0xFF),
             ],
             [
                 [[0xFF, 0xFF, 0xFF], [0xFF, 0xFF, 0xFF], [0xFF, 0xFF, 0xFF]],
@@ -204,12 +180,12 @@ def test_create_merged_image(
         pytest.param(
             [[1, 2, 4], [1, 2, 4], [1, 2, 4]],
             [
-                butterfly_merge.Color(0xFF, 0x00, 0x00),
-                butterfly_merge.Color(0x00, 0xFF, 0x00),
-                butterfly_merge.Color(0x00, 0x00, 0xFF),
-                butterfly_merge.Color(0xFF, 0xFF, 0x00),
-                butterfly_merge.Color(0xFF, 0x00, 0xFF),
-                butterfly_merge.Color(0x00, 0xFF, 0xFF),
+                butterfly_merge.Color(red=0xFF, green=0x00, blue=0x00),
+                butterfly_merge.Color(red=0x00, green=0xFF, blue=0x00),
+                butterfly_merge.Color(red=0x00, green=0x00, blue=0xFF),
+                butterfly_merge.Color(red=0xFF, green=0xFF, blue=0x00),
+                butterfly_merge.Color(red=0xFF, green=0x00, blue=0xFF),
+                butterfly_merge.Color(red=0x00, green=0xFF, blue=0xFF),
             ],
             [
                 [[0xFF, 0x00, 0x00], [0x00, 0xFF, 0x00], [0xFF, 0xFF, 0x00]],

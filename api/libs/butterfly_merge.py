@@ -1,33 +1,10 @@
-from dataclasses import asdict, dataclass
-
 import numpy as np
 import numpy.typing as npt
 import polars as pl
 
 from api.libs import butterfly, butterfly_image
 from api.libs.butterfly import ButterflyInfo
-
-
-@dataclass(frozen=True, slots=True)
-class Color:
-    red: int
-    green: int
-    blue: int
-
-    def __post_init__(self: "Color") -> None:
-        msg = "color value must be 0x00 to 0xFF"
-        if not 0x00 <= self.red <= 0xFF:  # noqa: PLR2004
-            raise ValueError(msg)
-        if not 0x00 <= self.green <= 0xFF:  # noqa: PLR2004
-            raise ValueError(msg)
-        if not 0x00 <= self.blue <= 0xFF:  # noqa: PLR2004
-            raise ValueError(msg)
-
-    def to_dict(self: "Color") -> dict[str, int]:
-        return asdict(self)
-
-    def to_tuple(self: "Color") -> tuple[int, int, int]:
-        return (self.red, self.green, self.blue)
+from api.libs.butterfly_config import Color
 
 
 def merge_info(info_list: list[ButterflyInfo]) -> ButterflyInfo:
@@ -85,5 +62,5 @@ def create_color_image(
 ) -> npt.NDArray[np.uint8]:
     img_merged = np.full((*img.shape, 3), 0xFF, dtype=np.uint8)
     for i, c in enumerate(cmap, 1):
-        img_merged[img == i] = c.to_tuple()
+        img_merged[img == i] = (c.red, c.green, c.blue)
     return img_merged
