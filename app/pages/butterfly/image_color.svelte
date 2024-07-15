@@ -5,8 +5,10 @@
   import ConfirmDialog from "@/components/confirm_dialog.svelte"
   import { FetchError } from "@/utils/fetch"
 
+  const defaultColors = "config/butterfly/color_map.json"
+
   let inputName = $state<string>("")
-  let colorsName = $state<string>("")
+  let colorsName = $state<string>(defaultColors)
   let outputName = $state<string>("")
   let overwrite = $state<boolean>(false)
 
@@ -21,7 +23,7 @@
   }
 
   const getFilesColors = () => {
-    return getFiles({ path: "config/colors", glob: "*.json" })
+    return getFiles({ path: "config/butterfly/color_map", glob: "*.json" })
   }
 
   let filesPromise = $state<ReturnType<typeof getFiles>>(getFilesImage())
@@ -66,12 +68,6 @@
         <p>no files</p>
       </Alert>
     </section>
-  {:else if colors.length === 0}
-    <section>
-      <Alert type="warning">
-        <p>no colors map</p>
-      </Alert>
-    </section>
   {:else}
     <section class="space-y-1">
       <select required bind:value={inputName}>
@@ -81,7 +77,7 @@
         {/each}
       </select>
       <select required bind:value={colorsName}>
-        <option value="" selected disabled>select colors map</option>
+        <option value={defaultColors} selected>default</option>
         {#each colors as color}
           <option value={color}>{color.replace(/^config\//, "")}</option>
         {/each}
