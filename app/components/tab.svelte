@@ -18,7 +18,7 @@
 
 <div class={className}>
   <div class="px-2">
-    <div class="flex gap-x-2 overflow-x-auto">
+    <div class="scrollbar-none flex gap-x-2 overflow-x-auto whitespace-nowrap">
       {#each titles as title, i}
         <button
           class="rounded-b-none border-2 border-b-0 border-gray-300"
