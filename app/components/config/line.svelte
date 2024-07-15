@@ -1,6 +1,8 @@
 <script lang="ts">
   import { type InferOutput, safeParse } from "valibot"
 
+  import lineList from "@/constants/line_list.json"
+  import markerList from "@/constants/marker_list.json"
   import { schemaLine } from "@/schemas/common"
 
   type Line = InferOutput<typeof schemaLine>
@@ -36,9 +38,19 @@
 
 <div class="space-y-1">
   <input placeholder="line label" bind:value={label} {hidden} />
-  <input placeholder="line style" bind:value={style} />
+  <select bind:value={style}>
+    <option value="" disabled>select line style</option>
+    {#each lineList as line}
+      <option value={line.style}>{line.description}</option>
+    {/each}
+  </select>
   <input placeholder="line width" type="number" bind:value={width} />
   <input placeholder="color" bind:value={color} />
-  <input placeholder="marker style" bind:value={marker} />
+  <select bind:value={marker}>
+    <option value="" disabled>select marker style</option>
+    {#each markerList as marker}
+      <option value={marker.style}>{marker.description}</option>
+    {/each}
+  </select>
   <input placeholder="marker size" type="number" bind:value={size} />
 </div>

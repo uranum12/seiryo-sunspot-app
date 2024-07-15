@@ -1,0 +1,106 @@
+[
+  {
+    "description": "point",
+    "style": "."
+  },
+  {
+    "description": "pixel",
+    "style": ","
+  },
+  {
+    "description": "circle",
+    "style": "o"
+  },
+  {
+    "description": "triangle_down",
+    "style": "v"
+  },
+  {
+    "description": "triangle_up",
+    "style": "^"
+  },
+  {
+    "description": "triangle_left",
+    "style": "<"
+  },
+  {
+    "description": "triangle_right",
+    "style": ">"
+  },
+  {
+    "description": "tri_down",
+    "style": "1"
+  },
+  {
+    "description": "tri_up",
+    "style": "2"
+  },
+  {
+    "description": "tri_left",
+    "style": "3"
+  },
+  {
+    "description": "tri_right",
+    "style": "4"
+  },
+  {
+    "description": "octagon",
+    "style": "8"
+  },
+  {
+    "description": "square",
+    "style": "s"
+  },
+  {
+    "description": "pentagon",
+    "style": "p"
+  },
+  {
+    "description": "plus (filled)",
+    "style": "P"
+  },
+  {
+    "description": "star",
+    "style": "*"
+  },
+  {
+    "description": "hexagon1",
+    "style": "h"
+  },
+  {
+    "description": "hexagon2",
+    "style": "H"
+  },
+  {
+    "description": "plus",
+    "style": "+"
+  },
+  {
+    "description": "x",
+    "style": "x"
+  },
+  {
+    "description": "x (filled)",
+    "style": "X"
+  },
+  {
+    "description": "diamond",
+    "style": "D"
+  },
+  {
+    "description": "thin_diamond",
+    "style": "d"
+  },
+  {
+    "description": "vline",
+    "style": "|"
+  },
+  {
+    "description": "hline",
+    "style": "_"
+  },
+  {
+    "description": "none",
+    "style": "None"
+  }
+]
