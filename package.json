@@ -25,7 +25,7 @@
   },
   "packageManager": "pnpm@9.5.0",
   "scripts": {
-    "fmt": "biome format --write . && prettier --write **/*.{toml,html,css,svelte}",
+    "fmt": "biome format --write . && prettier --cache --write **/*.{toml,html,css,svelte}",
     "lint": "biome check app && svelte-check",
     "fix": "biome check --write app"
   }
