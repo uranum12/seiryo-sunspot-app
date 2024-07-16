@@ -1,3 +1,4 @@
+import matplotlib as mpl
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 
@@ -13,6 +14,8 @@ from api.routers.sunspot_number_with_silso import (
     router as router_sunspot_number_with_silso,
 )
 from api.routers.utils import router as router_utils
+
+mpl.use("Agg")
 
 app = FastAPI()
 
