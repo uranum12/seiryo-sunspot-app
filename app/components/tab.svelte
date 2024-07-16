@@ -1,4 +1,5 @@
 <script lang="ts">
+  import clsx from "clsx"
   import type { Snippet } from "svelte"
 
   type Props = {
@@ -21,8 +22,10 @@
     <div class="scrollbar-none flex gap-x-2 overflow-x-auto whitespace-nowrap">
       {#each titles as title, i}
         <button
-          class="rounded-b-none border-2 border-b-0 border-gray-300"
-          class:!border-blue-300={tabNumber === i}
+          class={clsx(
+            "rounded-b-none border-2 border-b-0",
+            tabNumber === i ? "border-blue-300" : "border-gray-300"
+          )}
           onclick={() => tabClick(i)}
         >
           {title}

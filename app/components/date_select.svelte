@@ -1,4 +1,6 @@
 <script lang="ts">
+  import clsx from "clsx"
+
   import { formatDate, toDate, validateDate } from "@/utils/date"
 
   type Props = {
@@ -30,7 +32,7 @@
   })
 </script>
 
-<div class="{className} flex justify-between gap-x-1">
+<div class={clsx("flex justify-between gap-x-1", className)}>
   <input
     type="number"
     min="1000"

@@ -11,6 +11,7 @@ plugins = [
   "prettier-plugin-toml",
   "prettier-plugin-tailwindcss",
 ]
+tailwindFunctions = ["clsx"]
 
 [[overrides]]
 files = "*.svelte"

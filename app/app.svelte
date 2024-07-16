@@ -1,4 +1,6 @@
 <script lang="ts">
+  import clsx from "clsx"
+
   import Agg from "@/pages/agg/agg.svelte"
   import ButterflyAgg from "@/pages/butterfly/agg.svelte"
   import ButterflyDraw from "@/pages/butterfly/draw.svelte"
@@ -295,8 +297,10 @@
         {#each navs as nav}
           <a
             href={nav.path}
-            class="block whitespace-nowrap border-b-4 border-gray-300 px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none"
-            class:!border-blue-300={nav.selected}
+            class={clsx(
+              "block whitespace-nowrap border-b-4 px-4 py-2 hover:bg-gray-200 focus:bg-gray-200 focus:outline-none",
+              nav.selected ? "border-blue-300" : "border-gray-300"
+            )}
           >
             {nav.name}
           </a>

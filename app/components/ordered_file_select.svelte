@@ -1,4 +1,6 @@
 <script lang="ts">
+  import clsx from "clsx"
+
   type Props = {
     files: string[]
     selected: string[]
@@ -41,8 +43,11 @@
 </script>
 
 <div
-  class="{className} space-y-1 rounded border border-gray-300 p-2"
-  class:border-red-300={areaInvalid}
+  class={clsx(
+    "space-y-1 rounded border p-2",
+    areaInvalid ? "border-red-300" : "border-gray-300",
+    className
+  )}
 >
   {#each selectedFiles as _, index}
     <div class="flex items-baseline">

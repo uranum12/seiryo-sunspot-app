@@ -1,4 +1,5 @@
 <script lang="ts">
+  import clsx from "clsx"
   import type { Snippet } from "svelte"
 
   type Props = {
@@ -10,7 +11,7 @@
   let { summary, class: className, children }: Props = $props()
 </script>
 
-<details class="{className} group w-full rounded border border-gray-300">
+<details class={clsx("group w-full rounded border border-gray-300", className)}>
   <summary
     class="border-gray-300 p-2 focus:outline-blue-500 group-open:border-b"
   >

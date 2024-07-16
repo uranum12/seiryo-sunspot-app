@@ -1,4 +1,5 @@
 <script lang="ts">
+  import clsx from "clsx"
   import { untrack } from "svelte"
 
   import Alert from "@/components/alert.svelte"
@@ -40,7 +41,7 @@
   }
 </script>
 
-<div class="{className} space-y-1">
+<div class={clsx("space-y-1", className)}>
   <Filter bind:filter />
   {#if filtered.length === 0}
     <Alert type="warning">
@@ -53,8 +54,10 @@
     </div>
 
     <div
-      class="max-h-96 overflow-y-auto rounded border border-gray-300 p-2"
-      class:!border-red-300={fileSelectInvalid}
+      class={clsx(
+        "max-h-96 overflow-y-auto rounded border p-2",
+        fileSelectInvalid ? "border-red-300" : "border-gray-300"
+      )}
     >
       {#each filtered as file}
         <label>
