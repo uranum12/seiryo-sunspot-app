@@ -2,11 +2,10 @@
   import Accordion from "./accordion.svelte"
 
   type Props = {
-    class?: string
     filter: string
   }
 
-  let { class: className, filter = $bindable() }: Props = $props()
+  let { filter = $bindable() }: Props = $props()
 
   let filterInput = $state<string>("")
 
@@ -20,7 +19,7 @@
   }
 </script>
 
-<Accordion class={className} summary="filter">
+<Accordion summary="filter">
   <input bind:value={filterInput} class="mb-1" />
   <button onclick={filterApply}>apply</button>
   <button onclick={filterClear}>clear</button>

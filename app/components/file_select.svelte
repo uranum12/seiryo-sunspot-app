@@ -6,12 +6,11 @@
   import Filter from "@/components/filter.svelte"
 
   type Props = {
-    class?: string
     files: string[]
     selected: string[]
   }
 
-  let { class: className, files, selected = $bindable() }: Props = $props()
+  let { files, selected = $bindable() }: Props = $props()
 
   let checked = $state<string[]>([])
   let filter = $state<string>("")
@@ -41,7 +40,7 @@
   }
 </script>
 
-<div class={clsx("space-y-1", className)}>
+<div class="space-y-1">
   <Filter bind:filter />
   {#if filtered.length === 0}
     <Alert type="warning">

@@ -1,18 +1,14 @@
 <script lang="ts">
-  import clsx from "clsx"
-
   import { formatDate, toDate, validateDate } from "@/utils/date"
 
   type Props = {
     date: string | undefined
-    class?: string
     required?: boolean
     dayHidden?: boolean
   }
 
   let {
     date = $bindable(),
-    class: className,
     required = false,
     dayHidden: hidden = false,
   }: Props = $props()
@@ -32,7 +28,7 @@
   })
 </script>
 
-<div class={clsx("flex justify-between gap-x-1", className)}>
+<div class="flex justify-between gap-x-1">
   <input
     type="number"
     min="1000"

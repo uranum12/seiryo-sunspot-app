@@ -5,10 +5,9 @@
   type Props = {
     titles: string[]
     pages: Snippet[]
-    class?: string
   }
 
-  let { titles, pages, class: className }: Props = $props()
+  let { titles, pages }: Props = $props()
 
   let tabNumber = $state<number>(0)
 
@@ -17,7 +16,7 @@
   }
 </script>
 
-<div class={className}>
+<div>
   <div class="px-2">
     <div class="scrollbar-none flex gap-x-2 overflow-x-auto whitespace-nowrap">
       {#each titles as title, i}

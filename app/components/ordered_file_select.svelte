@@ -4,10 +4,9 @@
   type Props = {
     files: string[]
     selected: string[]
-    class?: string
   }
 
-  let { files, selected = $bindable(), class: className }: Props = $props()
+  let { files, selected = $bindable() }: Props = $props()
 
   let selectedFiles = $state<string[]>([""])
 
@@ -45,8 +44,7 @@
 <div
   class={clsx(
     "space-y-1 rounded border p-2",
-    areaInvalid ? "border-red-300" : "border-gray-300",
-    className
+    areaInvalid ? "border-red-300" : "border-gray-300"
   )}
 >
   {#each selectedFiles as _, index}
