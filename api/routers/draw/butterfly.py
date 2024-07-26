@@ -1,12 +1,13 @@
-import json
+import multiprocessing as mp
+import tempfile
+from base64 import b64encode
 from pathlib import Path
 
-import numpy as np
 from fastapi import APIRouter, Depends, HTTPException
 
-from api.libs import butterfly, butterfly_draw, utils
 from api.libs.butterfly_config import ButterflyDiagram
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
+from api.tasks import butterfly as task_butterfly
 
 router = APIRouter(prefix="/draw")
 
@@ -25,17 +26,25 @@ def draw_butterfly(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f:
-            config = ButterflyDiagram(**json.load(f))
+            ButterflyDiagram.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    with np.load(input_path.with_suffix(".npz")) as f_img:
-        img = f_img["img"]
-    with input_path.with_suffix(".json").open("r") as f_info:
-        info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
-    fig = butterfly_draw.draw_butterfly_diagram(img, info, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=task_butterfly.draw_butterfly_diagram,
+            args=(
+                str(input_path.with_suffix(".npz")),
+                str(input_path.with_suffix(".json")),
+                str(config_path),
+                f_tmp.name,
+            ),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -58,21 +67,22 @@ def save_butterfly(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = ButterflyDiagram(**json.load(f))
+            ButterflyDiagram.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    with np.load(input_path.with_suffix(".npz")) as f_img:
-        img = f_img["img"]
-    with input_path.with_suffix(".json").open("r") as f_info:
-        info = butterfly.ButterflyInfo.from_dict(json.load(f_info))
-    fig = butterfly_draw.draw_butterfly_diagram(img, info, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=task_butterfly.draw_butterfly_diagram,
+        args=(
+            str(input_path.with_suffix(".npz")),
+            str(input_path.with_suffix(".json")),
+            str(config_path),
+            str(output_path),
+        ),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
