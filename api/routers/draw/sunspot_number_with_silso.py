@@ -1,10 +1,10 @@
-import json
+import multiprocessing as mp
+import tempfile
+from base64 import b64encode
 from pathlib import Path
 
-import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 
-from api.libs import sunspot_number_with_silso, utils
 from api.libs.sunspot_number_with_silso_config import (
     SunspotNumberDiff,
     SunspotNumberRatio,
@@ -14,6 +14,7 @@ from api.libs.sunspot_number_with_silso_config import (
     SunspotNumberWithSilso,
 )
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
+from api.tasks import sunspot_number_with_silso as tasks
 
 router = APIRouter(prefix="/draw")
 
@@ -32,14 +33,20 @@ def draw_with_silso(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberWithSilso(**json.load(f))
+            SunspotNumberWithSilso.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_silso.draw_sunspot_number_with_silso(df, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_sunspot_number_with_silso,
+            args=(str(input_path), str(config_path), f_tmp.name),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -62,20 +69,19 @@ def save_with_silso(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberWithSilso(**json.load(f))
+            SunspotNumberWithSilso.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_silso.draw_sunspot_number_with_silso(df, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_sunspot_number_with_silso,
+        args=(str(input_path), str(config_path), str(output_path)),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -98,18 +104,25 @@ def draw_scatter(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberScatter(**json.load(f_config))
+            SunspotNumberScatter.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(with_silso_path)
-    with factor_r2_path.open("r") as f_factor_r2:
-        json_data = json.load(f_factor_r2)
-        factor = json_data["factor"]
-        r2 = json_data["r2"]
-    fig = sunspot_number_with_silso.draw_scatter(df, factor, r2, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_scatter,
+            args=(
+                str(with_silso_path),
+                str(factor_r2_path),
+                str(config_path),
+                f_tmp.name,
+            ),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -137,24 +150,24 @@ def save_scatter(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberScatter(**json.load(f_config))
+            SunspotNumberScatter.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(with_silso_path)
-    with factor_r2_path.open("r") as f_factor_r2:
-        json_data = json.load(f_factor_r2)
-        factor = json_data["factor"]
-        r2 = json_data["r2"]
-    fig = sunspot_number_with_silso.draw_scatter(df, factor, r2, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_scatter,
+        args=(
+            str(with_silso_path),
+            str(factor_r2_path),
+            str(config_path),
+            str(output_path),
+        ),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -177,17 +190,25 @@ def draw_ratio(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberRatio(**json.load(f_config))
+            SunspotNumberRatio.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(ratio_diff_path)
-    with factor_r2_path.open("r") as f_factor_r2:
-        json_data = json.load(f_factor_r2)
-        factor = json_data["factor"]
-    fig = sunspot_number_with_silso.draw_ratio(df, factor, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_ratio,
+            args=(
+                str(ratio_diff_path),
+                str(factor_r2_path),
+                str(config_path),
+                f_tmp.name,
+            ),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -215,23 +236,24 @@ def save_ratio(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberRatio(**json.load(f_config))
+            SunspotNumberRatio.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(ratio_diff_path)
-    with factor_r2_path.open("r") as f_factor_r2:
-        json_data = json.load(f_factor_r2)
-        factor = json_data["factor"]
-    fig = sunspot_number_with_silso.draw_ratio(df, factor, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_ratio,
+        args=(
+            str(ratio_diff_path),
+            str(factor_r2_path),
+            str(config_path),
+            str(output_path),
+        ),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -249,14 +271,20 @@ def draw_diff(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberDiff(**json.load(f_config))
+            SunspotNumberDiff.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_silso.draw_diff(df, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_diff,
+            args=(str(input_path), str(config_path), f_tmp.name),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -279,20 +307,19 @@ def save_diff(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberDiff(**json.load(f))
+            SunspotNumberDiff.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_silso.draw_diff(df, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_diff,
+        args=(str(input_path), str(config_path), str(output_path)),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -315,17 +342,25 @@ def draw_ratio_diff_1(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberRatioDiff1(**json.load(f_config))
+            SunspotNumberRatioDiff1.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(ratio_diff_path)
-    with factor_r2_path.open("r") as f_factor_r2:
-        json_data = json.load(f_factor_r2)
-        factor = json_data["factor"]
-    fig = sunspot_number_with_silso.draw_ratio_diff_1(df, factor, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_ratio_diff_1,
+            args=(
+                str(ratio_diff_path),
+                str(factor_r2_path),
+                str(config_path),
+                f_tmp.name,
+            ),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -353,23 +388,24 @@ def save_ratio_diff_1(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberRatioDiff1(**json.load(f_config))
+            SunspotNumberRatioDiff1.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(ratio_diff_path)
-    with factor_r2_path.open("r") as f_factor_r2:
-        json_data = json.load(f_factor_r2)
-        factor = json_data["factor"]
-    fig = sunspot_number_with_silso.draw_ratio_diff_1(df, factor, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_ratio_diff_1,
+        args=(
+            str(ratio_diff_path),
+            str(factor_r2_path),
+            str(config_path),
+            str(output_path),
+        ),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -387,14 +423,20 @@ def draw_ratio_diff_2(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberRatioDiff2(**json.load(f_config))
+            SunspotNumberRatioDiff2.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_silso.draw_ratio_diff_2(df, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_ratio_diff_2,
+            args=(str(input_path), str(config_path), f_tmp.name),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -417,18 +459,17 @@ def save_ratio_diff_2(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberRatioDiff2(**json.load(f))
+            SunspotNumberRatioDiff2.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_silso.draw_ratio_diff_2(df, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_ratio_diff_2,
+        args=(str(input_path), str(config_path), str(output_path)),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
