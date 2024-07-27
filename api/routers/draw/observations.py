@@ -1,12 +1,13 @@
-import json
+import multiprocessing as mp
+import tempfile
+from base64 import b64encode
 from pathlib import Path
 
-import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 
-from api.libs import observations, utils
 from api.libs.observations_config import ObservationsMonthly
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
+from api.tasks import observations as task_observations
 
 router = APIRouter(prefix="/draw")
 
@@ -27,14 +28,20 @@ def observations_draw_monthly_preview(
         )
     try:
         with config_path.open("r") as f:
-            config = ObservationsMonthly(**json.load(f))
+            ObservationsMonthly.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = observations.draw_monthly_obs_days(df, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=task_observations.draw_monthly_obs_days,
+            args=(str(input_path), str(config_path), f_tmp.name),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -57,18 +64,17 @@ def observations_draw_monthly_save(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = ObservationsMonthly(**json.load(f))
+            ObservationsMonthly.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = observations.draw_monthly_obs_days(df, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=task_observations.draw_monthly_obs_days,
+        args=(str(input_path), str(config_path), str(output_path)),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
