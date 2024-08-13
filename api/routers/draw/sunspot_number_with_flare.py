@@ -1,15 +1,16 @@
-import json
+import multiprocessing as mp
+import tempfile
+from base64 import b64encode
 from pathlib import Path
 
-import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 
-from api.libs import sunspot_number_with_flare, utils
 from api.libs.sunspot_number_with_flare_config import (
     SunspotNumberWithFlare,
     SunspotNumberWithFlareHemispheric,
 )
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
+from api.tasks import sunspot_number_with_flare as tasks
 
 router = APIRouter(prefix="/draw")
 
@@ -28,14 +29,20 @@ def draw_with_flare(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberWithFlare(**json.load(f))
+            SunspotNumberWithFlare.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare(df, config)
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_sunspot_number_with_flare,
+            args=(str(input_path), None, str(config_path), f_tmp.name),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -58,20 +65,19 @@ def save_with_flare(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberWithFlare(**json.load(f))
+            SunspotNumberWithFlare.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare(df, config)
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_sunspot_number_with_flare,
+        args=(str(input_path), None, str(config_path), str(output_path)),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -94,19 +100,25 @@ def draw_with_flare_with_factor(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberWithFlare(**json.load(f_config))
+            SunspotNumberWithFlare.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(with_flare_path)
-    with factors_path.open("r") as f_factors:
-        json_data = json.load(f_factors)
-        factor = json_data["total"]
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare(
-        df, config, factor=factor
-    )
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_sunspot_number_with_flare,
+            args=(
+                str(with_flare_path),
+                str(factors_path),
+                str(config_path),
+                f_tmp.name,
+            ),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -136,25 +148,24 @@ def save_with_flare_with_factor(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f_config:
-            config = SunspotNumberWithFlare(**json.load(f_config))
+            SunspotNumberWithFlare.model_validate_json(f_config.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(with_flare_path)
-    with factors_path.open("r") as f_factors:
-        json_data = json.load(f_factors)
-        factor = json_data["total"]
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare(
-        df, config, factor=factor
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_sunspot_number_with_flare,
+        args=(
+            str(with_flare_path),
+            str(factors_path),
+            str(config_path),
+            str(output_path),
+        ),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
-    )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -172,16 +183,20 @@ def draw_hemispheric(query: PreviewQuery = Depends()) -> PreviewRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberWithFlareHemispheric(**json.load(f))
+            SunspotNumberWithFlareHemispheric.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare_hemispheric(
-        df, config
-    )
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_sunspot_number_with_flare_hemispheric,
+            args=(str(input_path), None, str(config_path), f_tmp.name),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -204,22 +219,19 @@ def save_hemispheric(body: SaveBody) -> SaveRes:
         )
     try:
         with config_path.open("r") as f:
-            config = SunspotNumberWithFlareHemispheric(**json.load(f))
+            SunspotNumberWithFlareHemispheric.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(input_path)
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare_hemispheric(
-        df, config
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_sunspot_number_with_flare_hemispheric,
+        args=(str(input_path), None, str(config_path), str(output_path)),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
-    )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
 
 
@@ -243,21 +255,26 @@ def draw_hemispheric_with_factors(
             status_code=404, detail=f"config {config_path} not found"
         )
     try:
-        with config_path.open("r") as f_config:
-            config = SunspotNumberWithFlareHemispheric(**json.load(f_config))
+        with config_path.open("r") as f:
+            SunspotNumberWithFlareHemispheric.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(with_flare_path)
-    with factors_path.open("r") as f_factors:
-        json_data = json.load(f_factors)
-        factor_north = json_data["north"]
-        factor_south = json_data["south"]
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare_hemispheric(
-        df, config, factor_north=factor_north, factor_south=factor_south
-    )
-    img = utils.fig_to_base64(fig)
+    with tempfile.NamedTemporaryFile() as f_tmp:
+        ctx = mp.get_context("spawn")
+        p = ctx.Process(
+            target=tasks.draw_sunspot_number_with_flare_hemispheric,
+            args=(
+                str(with_flare_path),
+                str(factors_path),
+                str(config_path),
+                f_tmp.name,
+            ),
+        )
+        p.start()
+        p.join()
+        img = b64encode(f_tmp.read()).decode()
     return PreviewRes(img=img)
 
 
@@ -286,25 +303,23 @@ def save_hemispheric_with_factors(body: SaveBody) -> SaveRes:
             status_code=400, detail=f"file {output_path} already exists"
         )
     try:
-        with config_path.open("r") as f_config:
-            config = SunspotNumberWithFlareHemispheric(**json.load(f_config))
+        with config_path.open("r") as f:
+            SunspotNumberWithFlareHemispheric.model_validate_json(f.read())
     except ValueError as e:
         raise HTTPException(
             status_code=400, detail=f"config {config_path} is broken"
         ) from e
-    df = pl.read_parquet(with_flare_path)
-    with factors_path.open("r") as f_factors:
-        json_data = json.load(f_factors)
-        factor_north = json_data["north"]
-        factor_south = json_data["south"]
-    fig = sunspot_number_with_flare.draw_sunspot_number_with_flare_hemispheric(
-        df, config, factor_north=factor_north, factor_south=factor_south
+    ctx = mp.get_context("spawn")
+    p = ctx.Process(
+        target=tasks.draw_sunspot_number_with_flare_hemispheric,
+        args=(
+            str(with_flare_path),
+            str(factors_path),
+            str(config_path),
+            str(output_path),
+        ),
+        kwargs={"fmt": body.format, "dpi": body.dpi},
     )
-    fig.savefig(
-        output_path,
-        format=body.format,
-        dpi=body.dpi,
-        bbox_inches="tight",
-        pad_inches=0.1,
-    )
+    p.start()
+    p.join()
     return SaveRes(output=str(output_path))
