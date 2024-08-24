@@ -874,6 +874,16 @@ files = [
 ]
 
 [[package]]
+name = "nkf"
+version = "1.0.4"
+description = "Python Interface to NKF"
+optional = false
+python-versions = ">=3.9"
+files = [
+    {file = "nkf-1.0.4.tar.gz", hash = "sha256:7eda1424883d351ae8f28ada4ca6cf423ec47c63745d83d4c0c6b8817192b601"},
+]
+
+[[package]]
 name = "numpy"
 version = "2.0.0"
 description = "Fundamental package for array computing in Python"
@@ -1887,4 +1897,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "10e9378606cbc7e641a2682d8af16b044f97842d608b5daef47e4f3da7732c87"
+content-hash = "e65e471195fb85f6edb99e2c5362c85a0f660a6abc4f7d50f00de3de7f1d66d8"

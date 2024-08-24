@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 
 import matplotlib.font_manager as fm
+import nkf
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 
@@ -39,7 +40,9 @@ def file_csv(query: FileCsvQuery = Depends()) -> FileCsvRes:
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    with input_path.open("r") as f:
+    with input_path.open("rb") as fb:
+        encoding = nkf.guess(fb.read()).lower()
+    with input_path.open("r", encoding=encoding) as f:
         reader = csv.reader(f)
         data = list(reader)
     max_len = max(len(row) for row in data)

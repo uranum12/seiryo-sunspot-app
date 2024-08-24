@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Literal, TypeAlias
 
+import nkf
 import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
@@ -119,7 +120,9 @@ def validate_file(query: CheckFileQuery = Depends()) -> CheckFileRes:
         raise HTTPException(
             status_code=404, detail=f"file {input_path} not found"
         )
-    with input_path.open("r") as f:
+    with input_path.open("rb") as fb:
+        encoding = nkf.guess(fb.read()).lower()
+    with input_path.open("r", encoding=encoding) as f:
         ret = check_file.validate_file(f)
     errors: list[CheckFileError] = []
     for err in ret:
