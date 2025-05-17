@@ -3,8 +3,7 @@ from pathlib import Path
 import polars as pl
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
-from api.libs import agg
+from seiryo_sunspot_lib import agg
 
 
 class AggMain(BaseModel):

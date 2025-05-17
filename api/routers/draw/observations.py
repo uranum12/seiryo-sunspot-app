@@ -4,8 +4,8 @@ from base64 import b64encode
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
+from seiryo_sunspot_lib.observations_config import ObservationsMonthly
 
-from api.libs.observations_config import ObservationsMonthly
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
 from api.tasks import observations as task_observations
 

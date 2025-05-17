@@ -4,8 +4,8 @@ from pathlib import Path
 import polars as pl
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from seiryo_sunspot_lib import observations, observations_calendar
 
-from api.libs import observations, observations_calendar
 from api.routers.config.observations import router as router_config
 from api.routers.draw.observations import router as router_draw
 

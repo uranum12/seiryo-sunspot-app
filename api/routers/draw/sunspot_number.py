@@ -4,11 +4,11 @@ from base64 import b64encode
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
-
-from api.libs.sunspot_number_config import (
+from seiryo_sunspot_lib.sunspot_number_config import (
     SunspotNumberHemispheric,
     SunspotNumberWholeDisk,
 )
+
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
 from api.tasks import sunspot_number as task_sunspot_number
 

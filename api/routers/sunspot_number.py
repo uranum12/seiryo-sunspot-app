@@ -3,8 +3,8 @@ from pathlib import Path
 import polars as pl
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from seiryo_sunspot_lib import sunspot_number
 
-from api.libs import sunspot_number
 from api.routers.config.sunspot_number import router as router_config
 from api.routers.draw.sunspot_number import router as router_draw
 

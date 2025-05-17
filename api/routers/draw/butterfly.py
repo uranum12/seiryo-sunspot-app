@@ -4,8 +4,8 @@ from base64 import b64encode
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
+from seiryo_sunspot_lib.butterfly_config import ButterflyDiagram
 
-from api.libs.butterfly_config import ButterflyDiagram
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
 from api.tasks import butterfly as task_butterfly
 

@@ -6,8 +6,8 @@ import polars as pl
 
 mpl.use("Agg")
 
-from api.libs import sunspot_number_with_silso
-from api.libs.sunspot_number_with_silso_config import (
+from seiryo_sunspot_lib import sunspot_number_with_silso
+from seiryo_sunspot_lib.sunspot_number_with_silso_config import (
     SunspotNumberDiff,
     SunspotNumberRatio,
     SunspotNumberRatioDiff1,

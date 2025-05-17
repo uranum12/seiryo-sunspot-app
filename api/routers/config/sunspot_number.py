@@ -4,12 +4,13 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
-
-from api.libs import sunspot_number, utils
-from api.libs.sunspot_number_config import (
+from seiryo_sunspot_lib import sunspot_number
+from seiryo_sunspot_lib.sunspot_number_config import (
     SunspotNumberHemispheric,
     SunspotNumberWholeDisk,
 )
+
+from api.libs import utils
 from api.models.config import (
     CreateConfigBody,
     CreateConfigRes,

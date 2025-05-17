@@ -4,9 +4,8 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
-
-from api.libs import sunspot_number_with_silso, utils
-from api.libs.sunspot_number_with_silso_config import (
+from seiryo_sunspot_lib import sunspot_number_with_silso
+from seiryo_sunspot_lib.sunspot_number_with_silso_config import (
     SunspotNumberDiff,
     SunspotNumberRatio,
     SunspotNumberRatioDiff1,
@@ -14,6 +13,8 @@ from api.libs.sunspot_number_with_silso_config import (
     SunspotNumberScatter,
     SunspotNumberWithSilso,
 )
+
+from api.libs import utils
 from api.models.config import (
     CreateConfigBody,
     CreateConfigRes,

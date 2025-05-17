@@ -4,8 +4,7 @@ from base64 import b64encode
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
-
-from api.libs.sunspot_number_with_silso_config import (
+from seiryo_sunspot_lib.sunspot_number_with_silso_config import (
     SunspotNumberDiff,
     SunspotNumberRatio,
     SunspotNumberRatioDiff1,
@@ -13,6 +12,7 @@ from api.libs.sunspot_number_with_silso_config import (
     SunspotNumberScatter,
     SunspotNumberWithSilso,
 )
+
 from api.models.draw import PreviewQuery, PreviewRes, SaveBody, SaveRes
 from api.tasks import sunspot_number_with_silso as tasks
 

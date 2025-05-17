@@ -6,8 +6,8 @@ import polars as pl
 
 mpl.use("Agg")
 
-from api.libs import observations
-from api.libs.observations_config import ObservationsMonthly
+from seiryo_sunspot_lib import observations
+from seiryo_sunspot_lib.observations_config import ObservationsMonthly
 
 
 def draw_monthly_obs_days(

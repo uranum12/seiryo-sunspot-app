@@ -6,8 +6,8 @@ import numpy as np
 
 mpl.use("Agg")
 
-from api.libs import butterfly, butterfly_draw
-from api.libs.butterfly_config import ButterflyDiagram
+from seiryo_sunspot_lib import butterfly, butterfly_draw
+from seiryo_sunspot_lib.butterfly_config import ButterflyDiagram
 
 
 def draw_butterfly_diagram(  # noqa: PLR0913

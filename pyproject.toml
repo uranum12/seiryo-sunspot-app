@@ -9,12 +9,9 @@ fastapi = "^0.111.0"
 pydantic = "^2.7.1"
 polars = { extras = ["numpy"], version = "^1.0.0" }
 matplotlib = "^3.9.0"
-python-dateutil = "^2.9.0"
-more-itertools = "^10.3.0"
 numpy = "^2.0.0"
-scipy = "^1.14.0"
-scikit-learn = "^1.5.1"
 nkf = "^1.0.4"
+seiryo-sunspot-lib = {git = "https://github.com/uranum12/seiryo-sunspot-lib", rev = "6e9fd5e1c175e8c1c3fea5dc0533868ff9486de3"}
 
 [tool.poetry.group.dev.dependencies]
 invoke = "*"

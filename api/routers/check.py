@@ -5,8 +5,7 @@ import nkf
 import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-
-from api.libs import check_data, check_file, finder
+from seiryo_sunspot_lib import check_data, check_file, finder
 
 
 class CheckFileErrorHeader(BaseModel):

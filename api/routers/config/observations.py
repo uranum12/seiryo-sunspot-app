@@ -4,9 +4,10 @@ from pathlib import Path
 import numpy as np
 import polars as pl
 from fastapi import APIRouter, Depends, HTTPException
+from seiryo_sunspot_lib import observations
+from seiryo_sunspot_lib.observations_config import ObservationsMonthly
 
-from api.libs import observations, utils
-from api.libs.observations_config import ObservationsMonthly
+from api.libs import utils
 from api.models.config import (
     CreateConfigBody,
     CreateConfigRes,
