@@ -2,25 +2,22 @@
 
 ## app
 
-### install
+### Install
 
 ```sh
 pnpm install
 ```
 
-### build
+### Build
 
 ```sh
-node ./build.js
+pnpm run build
 ```
 
-### develop
+### Develop
 
 ```sh
-NODE_ENV="development" node ./build.js
-pnpm fmt
-pnpm lint
-pnpm fix
+pnpm run dev
 ```
 
 ## api
@@ -28,7 +25,7 @@ pnpm fix
 ### install
 
 ```sh
-poetry install --sync
+poetry sync
 ```
 
 ### run
